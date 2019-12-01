@@ -661,9 +661,10 @@ class NQueen1:
             if matchFound==True:
                 tempArray[i] = 0
 
-        # Lücken in tempArray werden mit Zahlen von crossNumbers aufgefüllt
+        # Lücken in tempArray werden mit Zahlen von numbers aufgefüllt
         k = 0
         # hier wird gecheckt ob crossNumbers leer ist, wenn ja wird nichts gemacht
+        #TODO exception bearbeiten
         if numbers:
             for i in range(self.mMaxLength):
                 if tempArray[i] == 0:
@@ -671,13 +672,17 @@ class NQueen1:
                         tempArray[i] = numbers[k]
                         k += 1
                     elif 0 in numbers:
-                        tempArray[i] = numbers[k]
-                        k += 1
+                        try:
+                            tempArray[i] = numbers[k]
+                            k += 1
+                        except IndexError:
+                            sys.stdout.write(str(k)+" :k, schiefgelaufen.. i: "+str(i)+ "\n")
+
 
         return tempArray
 
-
-
+        #TODO kann das wirklcih weg?
+        '''
         # Lücken in tempArray werden mit Zahlen von crossNumbers aufgefüllt
         k = 0
         # hier wird gecheckt ob crossNumbers leer ist, wenn ja wird nichts gemacht
@@ -693,6 +698,8 @@ class NQueen1:
 
         for i in range(self.mMaxLength):
             newChromo1.set_data(i, tempArray1[i])
+            
+        '''
 
 
     #Verschiebungsmutatation: 2 Punkte und die Gene dazwischen werden im Chromosom verschoben
