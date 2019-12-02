@@ -5,12 +5,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 from Chromosome import Chromosome
 
-START_SIZE = 25  # Population size at start.
+START_SIZE = 2  # Population size at start.
 MAX_EPOCHS = 2  # Arbitrary number of test cycles. EIGENTLICH AUF 1000 GESETZT!
-MATING_PROBABILITY = 0.7  # Probability of two chromosomes mating. Range: 0.0 < MATING_PROBABILITY < 1.0
-MUTATION_RATE = 0.001  # Mutation Rate. Range: 0.0 < MUTATION_RATE < 1.0
+MATING_PROBABILITY = 1  # Probability of two chromosomes mating. Range: 0.0 < MATING_PROBABILITY < 1.0
+MUTATION_RATE = 0  # Mutation Rate. Range: 0.0 < MUTATION_RATE < 1.0
 MIN_SELECT = 2  # Minimum parents allowed for selection.
-MAX_SELECT = 3  # Maximum parents allowed for selection. Range: MIN_SELECT < MAX_SELECT < START_SIZE
+MAX_SELECT = 2  # Maximum parents allowed for selection. Range: MIN_SELECT < MAX_SELECT < START_SIZE
 OFFSPRING_PER_GENERATION = 2  # New offspring created per generation. Range: 0 < OFFSPRING_PER_GENERATION < MAX_SELECT.
 MINIMUM_SHUFFLES = 8  # For randomizing starting chromosomes
 MAXIMUM_SHUFFLES = 20
@@ -177,9 +177,11 @@ class NQueen1:
             chromoIndex = len(self.population) - 1
 
             # Randomly choose the number of shuffles to perform.
+            # Randomly choose the number of shuffles to perform.
             shuffles = random.randrange(self.mMinimumShuffles, self.mMaximumShuffles)
 
             self.exchange_mutation(chromoIndex, shuffles)
+            #self.displacement_mutation(chromoIndex, shuffles)
 
             newChromo = self.population[chromoIndex]
             newChromo.toStr()
@@ -203,6 +205,7 @@ class NQueen1:
         for i in range(popSize):
             thisChromo = self.population[i]
             thisChromo.set_fitness((worstScore - thisChromo.get_conflicts()) * 100.0 / bestScore)
+
         print(thisChromo.get_conflicts())
 
         return
@@ -252,8 +255,7 @@ class NQueen1:
 
         while not done:
             # Randomly choose an eligible parent.
-            parent = random.randrange(0, len(self.population) - 1)
-            thisChromo = self.population[parent]
+            thisChromo = self.population[0]
             if thisChromo.get_selected() == True:
                 done = True
 
@@ -266,166 +268,13 @@ class NQueen1:
 
         while not done:
             # Randomly choose an eligible parent.
-            parentB = random.randrange(0, len(self.population) - 1)
             if parentB != parentA:
-                thisChromo = self.population[parentB]
+                thisChromo = self.population[1]
                 if thisChromo.get_selected() == True:
                     done = True
 
         return parentB
 
-    def partially_mapped_crossover(self, chromA, chromB, child1, child2):
-        # thisChromo = Chromosome(self.mMaxLength)
-        thisChromo = chromA
-        # thatChromo = Chromosome(self.mMaxLength)
-        thatChromo = chromB
-        # newChromo1 = Chromosome(self.mMaxLength)
-        newChromo1 = self.population[child1]
-        # newChromo2 = Chromosome(self.mMaxLength)
-        newChromo2 = self.population[child2]
-
-        crossPoint1 = random.randrange(0, self.mMaxLength)
-        crossPoint2 = self.get_exclusive_random_integer(self.mMaxLength, crossPoint1)
-        if crossPoint2 < crossPoint1:
-            j = crossPoint1
-            crossPoint1 = crossPoint2
-            crossPoint2 = j
-
-        # Copy Parent genes to offspring.
-        for i in range(self.mMaxLength):
-            newChromo1.set_data(i, thisChromo.get_data(i))
-            newChromo2.set_data(i, thatChromo.get_data(i))
-
-        for i in range(crossPoint1, crossPoint2 + 1):
-            # // Get the two items to swap.
-            item1 = thisChromo.get_data(i)
-            item2 = thatChromo.get_data(i)
-            pos1 = 0
-            pos2 = 0
-
-            # Get the items' positions in the offspring.
-            for j in range(self.mMaxLength):
-                if newChromo1.get_data(j) == item1:
-                    pos1 = j
-                elif newChromo1.get_data(j) == item2:
-                    pos2 = j
-
-            # Swap them.
-            if item1 != item2:
-                newChromo1.set_data(pos1, item2)
-                newChromo1.set_data(pos2, item1)
-
-            # Get the items'  positions in the offspring.
-            for j in range(self.mMaxLength):
-                if newChromo2.get_data(j) == item2:
-                    pos1 = j
-                elif newChromo2.get_data(j) == item1:
-                    pos2 = j
-
-            # Swap them.
-            if item1 != item2:
-                newChromo2.set_data(pos1, item1)
-                newChromo2.set_data(pos2, item2)
-
-        sys.stdout.write(str(crossPoint1) + " CrossPoints\n")
-        sys.stdout.write(str(crossPoint2) + " CrossPoints\n")
-        sys.stdout.write("Parent1")
-        thisChromo.toStr()
-        sys.stdout.write("Parent2")
-        thatChromo.toStr()
-
-        sys.stdout.write("Partially-maped Crossover verwendet.\nMit crossovertyp: " + str(thisChromo.get_crossover()) +
-                         ", " + str(thatChromo.get_crossover()) + "\nUnd fitness " + str(thisChromo.get_fitness()) +
-                         ", " + str(thatChromo.get_fitness()) + "\nUnd crossover der neuen: "
-                         + str(newChromo1.get_crossover()) + ", " + str(newChromo2.get_crossover()) + "\n")
-
-        return
-
-    def position_based_crossover(self, chromA, chromB, child1, child2):
-        k = 0
-        numPoints = 0
-        tempArray1 = [0] * self.mMaxLength
-        tempArray2 = [0] * self.mMaxLength
-        matchFound = False
-        # thisChromo = Chromosome(self.mMaxLength)
-        thisChromo = chromA
-        # thatChromo = Chromosome(self.mMaxLength)
-        thatChromo = chromB
-        # newChromo1 = Chromosome(self.mMaxLength)
-        newChromo1 = self.population[child1]
-        # newChromo2 = Chromosome(self.mMaxLength)
-        newChromo2 = self.population[child2]
-
-        # Choose and sort the crosspoints.
-        numPoints = random.randrange(0, self.mPBCMax)  # if PBC_MAX is set any higher than 6 or 8.
-        crossPoints = [0] * numPoints
-        for i in range(numPoints):
-            crossPoints[i] = self.get_exclusive_random_integer_by_array(0, self.mMaxLength - 1, crossPoints)
-        # Get non-chosens from parent 2: Die Zahlen die bei P2 nicht an den ausgewählten Stellen bei P1 stehen werden in
-        # einem Array gesammelt (tempArray1)
-        k = 0
-        for i in range(self.mMaxLength):
-            matchFound = False
-            for j in range(numPoints):
-                if thatChromo.get_data(i) == thisChromo.get_data(crossPoints[j]):
-                    matchFound = True
-
-            if matchFound == False:
-                tempArray1[k] = thatChromo.get_data(i)
-                k += 1
-        # Insert chosens into child 1: in Child 1 werden die Zahlen von P1 an gewählter Position gesetzt, Rest
-        # freigelassen
-        for i in range(numPoints):
-            newChromo1.set_data(crossPoints[i], thisChromo.get_data(crossPoints[i]))
-
-        # Fill in non-chosens to child 1.
-        k = 0
-        for i in range(self.mMaxLength):
-            matchFound = False
-            for j in range(numPoints):
-                if i == crossPoints[j]:
-                    matchFound = True
-
-            if matchFound == False:
-                newChromo1.set_data(i, tempArray1[k])
-                k += 1
-        sys.stdout.write(str(crossPoints) + " CrossPoints\n")
-        sys.stdout.write("Parent1")
-        thisChromo.toStr()
-        sys.stdout.write("Parent2")
-        thatChromo.toStr()
-        sys.stdout.write("Kind1  ")
-        newChromo1.toStr()
-        # Get non-chosens from parent 1
-        k = 0
-        for i in range(self.mMaxLength):
-            matchFound = False
-            for j in range(numPoints):
-                if thisChromo.get_data(i) == thatChromo.get_data(crossPoints[j]):
-                    matchFound = True
-
-            if matchFound == False:
-                tempArray2[k] = thisChromo.get_data(i)
-                k += 1
-
-        # Insert chosens into child 2.
-        for i in range(numPoints):
-            newChromo2.set_data(crossPoints[i], thatChromo.get_data(crossPoints[i]))
-
-        # Fill in non-chosens to child 2.
-        k = 0
-        for i in range(self.mMaxLength):
-            matchFound = False
-            for j in range(numPoints):
-                if i == crossPoints[j]:
-                    matchFound = True
-
-            if matchFound == False:
-                newChromo2.set_data(i, tempArray2[k])
-                k += 1
-
-        sys.stdout.write("Position-based Crossover verwendet.\n")
-        return
 
     # TODO methode klappt nicht ganz, es werden mehrere Boards angezeigt die nichtmal Bedingungen der Lsg entsprechen
     def order_based_crossover(self, chromA, chromB, child1, child2):
@@ -486,12 +335,20 @@ class NQueen1:
         sys.stdout.write(str(cpoints2) + " cpoints im 1.Parent\n")
         sys.stdout.write("Parent1")
         thisChromo.toStr()
+        sys.stdout.write("Fitness Parent1: ")
+        print(thisChromo.get_fitness())
         sys.stdout.write("Parent2")
         thatChromo.toStr()
+        sys.stdout.write("Fitness Parent2: ")
+        print(thatChromo.get_fitness())
         sys.stdout.write("Kind1  ")
         newChromo1.toStr()
+        sys.stdout.write("Fitness Kind1: ")
+        print(newChromo1.get_fitness())
         sys.stdout.write("Kind2  ")
         newChromo2.toStr()
+        sys.stdout.write("Fitness Kind2: ")
+        print(newChromo2.get_fitness())
         sys.stdout.write("Order-based Crossover verwendet.\n")
 
         return
@@ -633,16 +490,8 @@ class NQueen1:
     def do_mating(self):
 
         for i in range(self.mOffspringPerGeneration):
-            parentA = self.choose_first_parent()
-            # Test probability of mating.
-            getRand = random.randrange(0, 100)
-
-            if getRand <= self.mMatingProbability * 100:
-                parentB = self.choose_second_parent(parentA)
-
-                # das crossover des Elternteils mit größerer Fitness wird gewählt
-                chromA = self.population[parentA]
-                chromB = self.population[parentB]
+                chromA = self.population[0]
+                chromB = self.population[1]
 
                 print(chromA.get_fitness())
                 print(chromA.get_crossover())
@@ -659,13 +508,6 @@ class NQueen1:
                 self.order_based_co += 1
                 self.current_o_b += 1
 
-                if self.childCount - 1 == self.nextMutation:
-                    # self.exchange_mutation(newIndex1, 1)
-                    self.displacement_mutation(newIndex1)
-                elif self.childCount == self.nextMutation:
-                    # self.exchange_mutation(newIndex2, 1)
-                    self.displacement_mutation(newIndex2)
-
                 newChromo1 = self.population[newIndex1]
                 newChromo1.compute_conflicts()
                 newChromo2 = self.population[newIndex2]
@@ -673,9 +515,6 @@ class NQueen1:
 
                 self.childCount += 2
 
-                # Schedule next mutation.
-                if math.fmod(self.childCount, self.math_round(1.0 / self.mMutationRate)) == 0:
-                    self.nextMutation = self.childCount + random.randrange(0, self.math_round(1.0 / self.mMutationRate))
 
         return
 
@@ -708,12 +547,8 @@ class NQueen1:
         return
 
     def genetic_algorithm(self):
-        popSize = 0
         # thisChromo = Chromosome(self.mMaxLength)
         done = False
-
-        self.mutations = 0
-        self.nextMutation = random.randrange(0, self.math_round(1.0 / self.mMutationRate))
 
         while not done:
             popSize = len(self.population)
@@ -724,7 +559,7 @@ class NQueen1:
 
             self.get_fitness()
 
-            self.roulette_selection()
+            #self.roulette_selection()
 
             self.do_mating()
 
