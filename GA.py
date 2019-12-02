@@ -3,7 +3,7 @@ import random
 import sys
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
+from Chromosome import Chromosome
 
 START_SIZE = 75  # Population size at start.
 MAX_EPOCHS = 1000  # Arbitrary number of test cycles. EIGENTLICH AUF 1000 GESETZT!
@@ -16,7 +16,7 @@ MINIMUM_SHUFFLES = 8  # For randomizing starting chromosomes
 MAXIMUM_SHUFFLES = 20
 PBC_MAX = 4  # Maximum Position-Based Crossover points. Range: 0 < PBC_MAX < 8 (> 8 isn't good).
 
-MAX_LENGTH = 10  # chess board width.
+MAX_LENGTH = 8 # chess board width.
 
 
 #anderer code:
@@ -28,105 +28,6 @@ MAX_LENGTH = 10  # chess board width.
 
 #eltern nicht ganzwegschmeiße. kinder erezugen random , zsm schmeisen und dann die besten kinder weiternehmen.
 #vlt. nur ein kind? crossover dass das beste weitergegeben werden
-
-
-
-class Chromosome:
-    #crossover-type 0,1 oder 2 (partitielle_mapped, position_based und order_based)
-    def __init__(self, maxLength, crossover_type):
-        self.mMaxLength = maxLength
-        self.mFitness = 0.0
-        self.mSelected = False
-        self.mSelectionProbability = 0.0
-        self.mConflicts = 0
-        self.mCrossover = crossover_type
-
-        self.mData = [0] * maxLength
-        for i in range(self.mMaxLength):
-            self.mData[i] = i
-        return
-
-    def compute_conflicts(self):
-        x = 0
-        y = 0
-        tempx = 0
-        tempy = 0
-        board = []
-        conflicts = 0
-        dx = [-1, 1, -1, 1]
-        dy = [-1, 1, 1, -1]
-        done = False
-
-        for i in range(self.mMaxLength):
-            board.append([""] * self.mMaxLength)
-            board[i][self.mData[i]] = "Q"
-
-        # Walk through each of the Queens and compute the number of conflicts.
-        for i in range(self.mMaxLength):
-            x = i
-            y = self.mData[i]
-
-            # Check diagonals.
-            for j in range(4):
-                tempx = x
-                tempy = y
-                done = False
-                while not done:
-                    tempx += dx[j]
-                    tempy += dy[j]
-                    if (tempx < 0 or tempx >= self.mMaxLength) or (tempy < 0 or tempy >= self.mMaxLength):
-                        done = True
-                    else:
-                        if board[tempx][tempy] == "Q":
-                            conflicts += 1
-
-        self.mConflicts = conflicts
-        return
-
-    def get_conflicts(self):
-        return self.mConflicts
-
-    def set_selection_probability(self, probability):
-        self.mSelectionProbability = probability
-        return
-
-    def get_selection_probability(self):
-        return self.mSelectionProbability
-
-    def set_selected(self, isSelected):
-        self.mSelected = isSelected
-        return
-
-    def get_selected(self):
-        return self.mSelected
-
-    def set_fitness(self, score):
-        self.mFitness = score
-        return
-
-    def get_fitness(self):
-        return self.mFitness
-
-    def set_crossover(self, type):
-        self.mCrossover = type
-        return
-
-    def get_crossover(self):
-        return self.mCrossover
-
-    def set_data(self, index, value):
-        self.mData[index] = value
-        return
-
-    def get_data(self, index):
-        return self.mData[index]
-
-    # Gene des Chromosoms als String darstellen
-    def toStr(self):
-        array = [0]*self.mMaxLength
-        for i in range(self.mMaxLength):
-            array[i] = self.get_data(i)
-        return str(array)
 
 
 class NQueen1:
@@ -282,8 +183,7 @@ class NQueen1:
     def initialize_chromosomes(self):
         for i in range(self.mStartSize):
             #crossover des neuen Chromosoms wird bestimmt
-            rand = random.randrange(0,3)
-            sys.stdout.write("rand "+str(rand)+"\n")
+            rand = random.randrange(0, 3)
 
             newChromo = Chromosome(self.mMaxLength, rand)
             self.population.append(newChromo)
@@ -450,9 +350,10 @@ class NQueen1:
 
         sys.stdout.write(str(crossPoint1) + " CrossPoints\n")
         sys.stdout.write(str(crossPoint2) + " CrossPoints\n")
-        sys.stdout.write(str(thisChromo.toStr()) + " Parent1\n")
-        sys.stdout.write(str(thatChromo.toStr()) + " Parent2\n")
-        sys.stdout.write(str(newChromo1.toStr()) + " Kind1\n")
+        sys.stdout.write("Parent1")
+        thisChromo.toStr()
+        sys.stdout.write("Parent2")
+        thatChromo.toStr()
 
         sys.stdout.write("Partially-maped Crossover verwendet.\nMit crossovertyp: "+str(thisChromo.get_crossover())+
                          ", "+str(thatChromo.get_crossover())+"\nUnd fitness "+str(thisChromo.get_fitness())+
@@ -510,9 +411,12 @@ class NQueen1:
                 newChromo1.set_data(i, tempArray1[k])
                 k += 1
         sys.stdout.write(str(crossPoints) + " CrossPoints\n")
-        sys.stdout.write(str(thisChromo.toStr())+ " Parent1\n")
-        sys.stdout.write(str(thatChromo.toStr())+ " Parent2\n")
-        sys.stdout.write(str(newChromo1.toStr())+ " Kind1\n")
+        sys.stdout.write("Parent1")
+        thisChromo.toStr()
+        sys.stdout.write("Parent2")
+        thatChromo.toStr()
+        sys.stdout.write("Kind1  ")
+        newChromo1.toStr()
         # Get non-chosens from parent 1
         k = 0
         for i in range(self.mMaxLength):
@@ -607,10 +511,14 @@ class NQueen1:
         sys.stdout.write(str(crossNumbers2) + " CrossNumbers2: Zahlen im 2. Parent\n")
         sys.stdout.write(str(cpoints) + " cpoints im 2.Parent\n")
         sys.stdout.write(str(cpoints2) + " cpoints im 1.Parent\n")
-        sys.stdout.write(str(thisChromo.toStr()) + " Parent1\n")
-        sys.stdout.write(str(thatChromo.toStr())+ " Parent2\n")
-        sys.stdout.write(str(newChromo1.toStr()) + " kind1\n")
-        sys.stdout.write(str(newChromo2.toStr()) + " kind2\n")
+        sys.stdout.write("Parent1")
+        thisChromo.toStr()
+        sys.stdout.write("Parent2")
+        thatChromo.toStr()
+        sys.stdout.write("Kind1  ")
+        newChromo1.toStr()
+        sys.stdout.write("Kind2  ")
+        newChromo2.toStr()
         sys.stdout.write("Order-based Crossover verwendet.\n")
 
         return
@@ -789,7 +697,7 @@ class NQueen1:
                 print(chromA.get_fitness())
                 print(chromA.get_crossover())
                 print(chromB.get_fitness())
-                print(chromB.toStr())
+                chromB.toStr()
 
                 if type == 0:
                     newChromo1 = Chromosome(self.mMaxLength, 0)
