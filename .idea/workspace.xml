@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="125bcc7f-d543-43ac-a9ee-15ef7dffa3d5" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/orderbased.py" beforeDir="false" afterPath="$PROJECT_DIR$/orderbased.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/partiellemapped.py" beforeDir="false" afterPath="$PROJECT_DIR$/partiellemapped.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/positionbased.py" beforeDir="false" afterPath="$PROJECT_DIR$/positionbased.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -34,8 +33,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/GA.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1988">
-              <caret line="508" column="8" selection-start-line="508" selection-start-column="8" selection-end-line="508" selection-end-column="8" />
+            <state relative-caret-position="82">
+              <caret line="592" column="8" selection-start-line="592" selection-start-column="8" selection-end-line="592" selection-end-column="8" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -55,8 +54,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/orderbased.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="119">
-              <caret line="7" column="15" selection-start-line="7" selection-start-column="15" selection-end-line="7" selection-end-column="15" />
+            <state relative-caret-position="1584">
+              <caret line="269" column="49" lean-forward="true" selection-start-line="269" selection-start-column="49" selection-end-line="269" selection-end-column="49" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -65,10 +64,19 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
+        <entry file="file://$APPLICATION_HOME_DIR$/helpers/third_party/thriftpy/_shaded_thriftpy/_compat.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="220">
+              <caret line="101" selection-start-line="101" selection-end-line="101" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/positionbased.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="221">
-              <caret line="296" selection-start-line="296" selection-end-line="296" />
+            <state relative-caret-position="669">
+              <caret line="650" selection-start-line="650" selection-end-line="650" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -99,14 +107,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>ob is best</find>
-      <find>IS Best</find>
-      <find>encountere</find>
-      <find>done</find>
-      <find>pmarra</find>
-      <find>IS BE</find>
-      <find>is best</find>
-      <find>erhöhung</find>
       <find>nach er</find>
       <find>schief</find>
       <find>schiefgel</find>
@@ -126,9 +126,17 @@
       <find>mating</find>
       <find>initi</find>
       <find>type =</find>
-      <find>order_based_cros</find>
       <find>self.population.append</find>
       <find>type</find>
+      <find>epoch</find>
+      <find>minselect</find>
+      <find>mutation</find>
+      <find>order_based_cros</find>
+      <find>ARRAY_O_B</find>
+      <find>partielle</find>
+      <find>_crossover</find>
+      <find>partielle_mapped_</find>
+      <find>fitness</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -152,7 +160,7 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="-8" />
     <option name="width" value="992" />
     <option name="height" value="1056" />
@@ -178,6 +186,7 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
@@ -311,12 +320,12 @@
       <workItem from="1574773614879" duration="5011000" />
       <workItem from="1574892894299" duration="8000" />
       <workItem from="1574948943789" duration="15146000" />
-      <workItem from="1575289686745" duration="8076000" />
+      <workItem from="1575289686745" duration="10760000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="109365000" />
+    <option name="totallyTimeSpent" value="112049000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -330,12 +339,12 @@
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.15831557" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.09594883" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32936078" />
-      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.40411702" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.3997833" />
+      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.156013" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.23943663" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.32932165" />
@@ -343,13 +352,13 @@
       <window_info anchor="bottom" id="Version Control" order="8" />
       <window_info anchor="bottom" id="Database Changes" order="9" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
-      <window_info anchor="bottom" id="Terminal" order="11" weight="0.09967497" />
-      <window_info anchor="bottom" id="Python Console" order="12" weight="0.2567714" />
+      <window_info anchor="bottom" id="Terminal" order="11" weight="0.40520042" />
+      <window_info anchor="bottom" id="Python Console" order="12" weight="0.25568798" />
       <window_info anchor="bottom" id="Favorites" order="13" weight="0.115926325" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info active="true" anchor="right" id="SciView" order="3" visible="true" weight="0.057569295" />
+      <window_info active="true" anchor="right" id="SciView" order="3" visible="true" weight="0.09754797" />
       <window_info anchor="right" id="Database" order="4" weight="0.32995737" />
     </layout>
     <layout-to-restore>
@@ -380,10 +389,10 @@
     <option name="version" value="1" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/nQueens$orderbased.coverage" NAME="orderbased Coverage Results" MODIFIED="1575298429803" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/nQueens$orderbased.coverage" NAME="orderbased Coverage Results" MODIFIED="1575300937120" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/nQueens$partiellemapped.coverage" NAME="partiellemapped Coverage Results" MODIFIED="1575294165088" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/nQueens$positionbased.coverage" NAME="positionbased Coverage Results" MODIFIED="1575294097503" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/nQueens$GA.coverage" NAME="GA Coverage Results" MODIFIED="1575297313201" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/nQueens$GA.coverage" NAME="GA Coverage Results" MODIFIED="1575300605853" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python38/Lib/site-packages/matplotlib/axes/_axes.py">
@@ -424,10 +433,17 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$APPLICATION_HOME_DIR$/helpers/third_party/thriftpy/_shaded_thriftpy/_compat.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="220">
+          <caret line="101" selection-start-line="101" selection-end-line="101" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/positionbased.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="296" selection-start-line="296" selection-end-line="296" />
+        <state relative-caret-position="669">
+          <caret line="650" selection-start-line="650" selection-end-line="650" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>
@@ -436,8 +452,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/GA.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1988">
-          <caret line="508" column="8" selection-start-line="508" selection-start-column="8" selection-end-line="508" selection-end-column="8" />
+        <state relative-caret-position="82">
+          <caret line="592" column="8" selection-start-line="592" selection-start-column="8" selection-end-line="592" selection-end-column="8" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>
@@ -446,8 +462,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/orderbased.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="7" column="15" selection-start-line="7" selection-start-column="15" selection-end-line="7" selection-end-column="15" />
+        <state relative-caret-position="1584">
+          <caret line="269" column="49" lean-forward="true" selection-start-line="269" selection-start-column="49" selection-end-line="269" selection-end-column="49" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>
