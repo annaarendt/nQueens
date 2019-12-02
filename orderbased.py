@@ -5,13 +5,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 from Chromosome import Chromosome
 
-START_SIZE = 75  # Population size at start.
+START_SIZE = 25  # Population size at start.
 MAX_EPOCHS = 2  # Arbitrary number of test cycles. EIGENTLICH AUF 1000 GESETZT!
 MATING_PROBABILITY = 0.7  # Probability of two chromosomes mating. Range: 0.0 < MATING_PROBABILITY < 1.0
 MUTATION_RATE = 0.001  # Mutation Rate. Range: 0.0 < MUTATION_RATE < 1.0
-MIN_SELECT = 10  # Minimum parents allowed for selection.
-MAX_SELECT = 50  # Maximum parents allowed for selection. Range: MIN_SELECT < MAX_SELECT < START_SIZE
-OFFSPRING_PER_GENERATION = 20  # New offspring created per generation. Range: 0 < OFFSPRING_PER_GENERATION < MAX_SELECT.
+MIN_SELECT = 2  # Minimum parents allowed for selection.
+MAX_SELECT = 3  # Maximum parents allowed for selection. Range: MIN_SELECT < MAX_SELECT < START_SIZE
+OFFSPRING_PER_GENERATION = 2  # New offspring created per generation. Range: 0 < OFFSPRING_PER_GENERATION < MAX_SELECT.
 MINIMUM_SHUFFLES = 8  # For randomizing starting chromosomes
 MAXIMUM_SHUFFLES = 20
 PBC_MAX = 4  # Maximum Position-Based Crossover points. Range: 0 < PBC_MAX < 8 (> 8 isn't good).
@@ -197,6 +197,8 @@ class NQueen1:
         # Convert to a weighted percentage.
         thisChromo = self.population[self.get_minimum()]
         bestScore = worstScore - thisChromo.get_conflicts()
+        #TODO quickfiy, damit nicht durch 0 geteilt wird.
+        if bestScore==0: bestScore = 1
 
         for i in range(popSize):
             thisChromo = self.population[i]
@@ -678,9 +680,6 @@ class NQueen1:
         return
 
     def prep_next_epoch(self):
-        popSize = 0;
-        # thisChromo = Chromosome(self.mMaxLength)
-
         # Reset flags for selected individuals.
         popSize = len(self.population)
         for i in range(popSize):
