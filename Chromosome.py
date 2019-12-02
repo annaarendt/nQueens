@@ -1,0 +1,100 @@
+
+class Chromosome:
+    #crossover-type 0,1 oder 2 (partitielle_mapped, position_based und order_based)
+    def __init__(self, maxLength, crossover_type):
+        self.mMaxLength = maxLength
+        self.mFitness = 0.0
+        self.mSelected = False
+        self.mSelectionProbability = 0.0
+        self.mConflicts = 0
+        self.mCrossover = crossover_type
+
+        self.mData = [0] * maxLength
+        for i in range(self.mMaxLength):
+            self.mData[i] = i
+        return
+
+    def compute_conflicts(self):
+        x = 0
+        y = 0
+        tempx = 0
+        tempy = 0
+        board = []
+        conflicts = 0
+        dx = [-1, 1, -1, 1]
+        dy = [-1, 1, 1, -1]
+        done = False
+
+        for i in range(self.mMaxLength):
+            board.append([""] * self.mMaxLength)
+            board[i][self.mData[i]] = "Q"
+
+        # Walk through each of the Queens and compute the number of conflicts.
+        for i in range(self.mMaxLength):
+            x = i
+            y = self.mData[i]
+
+            # Check diagonals.
+            for j in range(4):
+                tempx = x
+                tempy = y
+                done = False
+                while not done:
+                    tempx += dx[j]
+                    tempy += dy[j]
+                    if (tempx < 0 or tempx >= self.mMaxLength) or (tempy < 0 or tempy >= self.mMaxLength):
+                        done = True
+                    else:
+                        if board[tempx][tempy] == "Q":
+                            conflicts += 1
+
+        self.mConflicts = conflicts
+        return
+
+    def get_conflicts(self):
+        return self.mConflicts
+
+    def set_selection_probability(self, probability):
+        self.mSelectionProbability = probability
+        return
+
+    def get_selection_probability(self):
+        return self.mSelectionProbability
+
+    def set_selected(self, isSelected):
+        self.mSelected = isSelected
+        return
+
+    def get_selected(self):
+        return self.mSelected
+
+    def set_fitness(self, score):
+        self.mFitness = score
+        return
+
+    def get_fitness(self):
+        return self.mFitness
+
+    def set_crossover(self, type):
+        self.mCrossover = type
+        return
+
+    def get_crossover(self):
+        return self.mCrossover
+
+    def set_data(self, index, value):
+        self.mData[index] = value
+        return
+
+    def get_data(self, index):
+        return self.mData[index]
+
+    # Gene des Chromosoms als String darstellen
+    def toStr(self):
+        array = [0]*self.mMaxLength
+        for i in range(self.mMaxLength):
+            array[i] = self.get_data(i)
+
+        print(str(array))
+        return str(array)
+
