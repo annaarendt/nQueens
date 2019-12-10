@@ -726,15 +726,15 @@ class NQueen1:
 
             self.epoch += 1
 
-            sys.stdout.write(str(self.array_p_m)+" ARRAY_P_M\n")
-            sys.stdout.write(str(self.array_p_b) + " ARRAY_P_B\n")
-            sys.stdout.write(str(self.array_o_b) + " ARRAY_O_B\n")
+            #sys.stdout.write(str(self.array_p_m)+" ARRAY_P_M\n")
+            #sys.stdout.write(str(self.array_p_b) + " ARRAY_P_B\n")
+            #sys.stdout.write(str(self.array_o_b) + " ARRAY_O_B\n")
 
             # This is here simply to show the runtime status.
             sys.stdout.write("Epoche: " + str(self.epoch) + "\n")
 
         sys.stdout.write("done.\n")
-        sys.stdout.write(str(max(self.array_p_m)) + " maximale Value.\n")
+        #sys.stdout.write(str(max(self.array_p_m)) + " maximale Value.\n")
 
         if self.epoch != self.mEpochs:
             popSize = len(self.population)
@@ -743,6 +743,7 @@ class NQueen1:
                 if thisChromo.get_conflicts() == 0:
                     sys.stdout.write(str(thisChromo.toStr())+" hat " + str(thisChromo.get_conflicts()) + " Konflikte.\n")
                     self.print_best_solution(thisChromo)
+                    break
 
         sys.stdout.write("Completed " + str(self.epoch) + " epochs.\n")
         sys.stdout.write(
@@ -772,8 +773,8 @@ class NQueen1:
         pbarray=np.asarray(self.array_p_b)
         obarray=np.asarray(self.array_o_b)
         x = np.arange(1, self.epoch, 1)
-        sys.stdout.write(str(x) +" this is it\n")
-        sys.stdout.write(str(pmarray) + " pmarray\n")
+        #sys.stdout.write(str(x) +" this is it\n")
+        #sys.stdout.write(str(pmarray) + " pmarray\n")
         y1 = pmarray[x]
         y2 = pbarray[x]
         y3 = obarray[x]
@@ -827,7 +828,8 @@ def show_overall_permutation_amount(array):
 if __name__ == '__main__':
     array = [0, 0, 0]
     counter = 0
-    while(counter != 10):
+    while(counter != 1):
+        sys.stdout.write("COUNTER: " + str(counter)+"\n")
         nq1 = NQueen1(START_SIZE, MAX_EPOCHS, MATING_PROBABILITY, MUTATION_RATE, MIN_SELECT, MAX_SELECT,
                       OFFSPRING_PER_GENERATION, MINIMUM_SHUFFLES, MAXIMUM_SHUFFLES, PBC_MAX, MAX_LENGTH)
 
@@ -838,8 +840,7 @@ if __name__ == '__main__':
         nq1.show_crossover_per_epoche()
 
         array = np.array(array) + nq1.get_best_crossover()
-        counter+=1
-        sys.stdout.write("COUNTER: " + str(counter)+"\n")
+        counter += 1
 
     print(array)
     show_overall_permutation_amount(array)
