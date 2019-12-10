@@ -6,17 +6,19 @@ import numpy as np
 from Chromosome import Chromosome
 
 START_SIZE = 75  # Population size at start.
-MAX_EPOCHS = 1000  # Arbitrary number of test cycles. EIGENTLICH AUF 1000 GESETZT!
+MAX_EPOCHS = 1000  # Arbitrary number of test cycles. Default 1000!
 MATING_PROBABILITY = 0.7  # Probability of two chromosomes mating. Range: 0.0 < MATING_PROBABILITY < 1.0
 MUTATION_RATE = 0.001  # Mutation Rate. Range: 0.0 < MUTATION_RATE < 1.0
 MIN_SELECT = 10  # Minimum parents allowed for selection.
 MAX_SELECT = 50  # Maximum parents allowed for selection. Range: MIN_SELECT < MAX_SELECT < START_SIZE
+#pro mating aber 2 Kinder -> offspring_per_epoche=1 erstellt 2 Kinder von 2 Eltern. wert auf 20 entspricht 40 kinder von
+#40 (nicht unbedignt unterschiedlichn) eltern
 OFFSPRING_PER_GENERATION = 20  # New offspring created per generation. Range: 0 < OFFSPRING_PER_GENERATION < MAX_SELECT.
 MINIMUM_SHUFFLES = 8  # For randomizing starting chromosomes
 MAXIMUM_SHUFFLES = 20
 PBC_MAX = 4  # Maximum Position-Based Crossover points. Range: 0 < PBC_MAX < 8 (> 8 isn't good).
 
-MAX_LENGTH = 8 # chess board width.
+MAX_LENGTH = 10 # chess board width.
 
 
 #anderer code:
@@ -93,7 +95,6 @@ class NQueen1:
         return getRand
 
     def math_round(self, inValue):
-        outValue = 0
         if math.modf(inValue)[0] >= 0.5:
             outValue = math.ceil(inValue)
         else:
@@ -102,11 +103,7 @@ class NQueen1:
 
     def get_maximum(self):
         # Returns an array index.
-        popSize = 0;
-        #thisChromo = Chromosome(self.mMaxLength)
-        #thatChromo = Chromosome(self.mMaxLength)
         maximum = 0
-        foundNewMaximum = False
         done = False
 
         while not done:
@@ -128,11 +125,7 @@ class NQueen1:
 
     def get_minimum(self):
         # Returns an array index.
-        popSize = 0;
-        #thisChromo = Chromosome(self.mMaxLength)
-        #thatChromo = Chromosome(self.mMaxLength)
         minimum = 0
-        foundNewMinimum = False
         done = False
 
         while not done:
@@ -155,10 +148,6 @@ class NQueen1:
     #Mutation, die einfach nur 2 Gene des Chromosoms austauscht
     def exchange_mutation(self, index, exchanges):
         i = 0
-        tempData = 0
-        #thisChromo = Chromosome(self.mMaxLength)
-        gene1 = 0
-        gene2 = 0
         done = False
 
         thisChromo = self.population[index]
@@ -202,9 +191,6 @@ class NQueen1:
     def get_fitness(self):
         # Lowest errors = 100%, Highest errors = 0%
         popSize = len(self.population)
-        #thisChromo = Chromosome(self.mMaxLength)
-        bestScore = 0
-        worstScore = 0
 
         # The worst score would be the one with the highest energy, best would be lowest.
         thisChromo = self.population[self.get_maximum()]
@@ -223,14 +209,7 @@ class NQueen1:
 
     #Selektion der Eltern mit Roulette-Methode. Je mehr Fitness, desto mehr Anteil auf dem Roulette
     def roulette_selection(self):
-        j = 0
-        popSize = 0
         genTotal = 0.0
-        selTotal = 0.0
-        rouletteSpin = 0.0
-        #thisChromo = Chromosome(self.mMaxLength)
-        #thatChromo = Chromosome(self.mMaxLength)
-        done = False
 
         popSize = len(self.population)
         for i in range(popSize):
@@ -268,7 +247,6 @@ class NQueen1:
 
     def choose_first_parent(self):
         parent = 0
-        #thisChromo = Chromosome(self.mMaxLength)
         done = False
 
         while not done:
@@ -282,7 +260,6 @@ class NQueen1:
 
     def choose_second_parent(self, parentA):
         parentB = 0
-        #thisChromo = Chromosome(self.mMaxLength)
         done = False
 
         while not done:
@@ -296,13 +273,9 @@ class NQueen1:
         return parentB
 
     def partially_mapped_crossover(self, chromA, chromB, child1, child2):
-        #thisChromo = Chromosome(self.mMaxLength)
         thisChromo = chromA
-        #thatChromo = Chromosome(self.mMaxLength)
         thatChromo = chromB
-        #newChromo1 = Chromosome(self.mMaxLength)
         newChromo1 = self.population[child1]
-        #newChromo2 = Chromosome(self.mMaxLength)
         newChromo2 = self.population[child2]
 
         crossPoint1 = random.randrange(0, self.mMaxLength)
@@ -363,18 +336,11 @@ class NQueen1:
         return
 
     def position_based_crossover(self, chromA, chromB, child1, child2):
-        k = 0
-        numPoints = 0
         tempArray1 = [0] * self.mMaxLength
         tempArray2 = [0] * self.mMaxLength
-        matchFound = False
-        #thisChromo = Chromosome(self.mMaxLength)
         thisChromo = chromA
-        #thatChromo = Chromosome(self.mMaxLength)
         thatChromo = chromB
-        #newChromo1 = Chromosome(self.mMaxLength)
         newChromo1 = self.population[child1]
-        #newChromo2 = Chromosome(self.mMaxLength)
         newChromo2 = self.population[child2]
 
         # Choose and sort the crosspoints.
@@ -450,18 +416,10 @@ class NQueen1:
 
     # TODO methode klappt nicht ganz, es werden mehrere Boards angezeigt die nichtmal Bedingungen der Lsg entsprechen
     def order_based_crossover(self, chromA, chromB, child1, child2):
-        k = 0
-        numPoints = 0
-        tempArray1 = [0] * self.mMaxLength
-        tempArray2 = [0] * self.mMaxLength
-        matchFound = False
-        #thisChromo = Chromosome(self.mMaxLength)
+
         thisChromo = chromA
-        #thatChromo = Chromosome(self.mMaxLength)
         thatChromo = chromB
-        #newChromo1 = Chromosome(self.mMaxLength)
         newChromo1 = self.population[child1]
-        #newChromo2 = Chromosome(self.mMaxLength)
         newChromo2 = self.population[child2]
 
 
@@ -589,42 +547,16 @@ class NQueen1:
 
         return tempArray
 
-        #TODO kann das wirklcih weg?
-        '''
-        # Lücken in tempArray werden mit Zahlen von crossNumbers aufgefüllt
-        k = 0
-        # hier wird gecheckt ob crossNumbers leer ist, wenn ja wird nichts gemacht
-        if crossNumbers:
-            for i in range(self.mMaxLength):
-                if tempArray1[i] == 0:
-                    if thatChromo.get_data(i) != 0:
-                        tempArray1[i] = crossNumbers[k]
-                        k += 1
-                    elif 0 in crossNumbers:
-                        tempArray1[i] = crossNumbers[k]
-                        k += 1
-
-        for i in range(self.mMaxLength):
-            newChromo1.set_data(i, tempArray1[i])
-            
-        '''
-
 
     #Verschiebungsmutatation: 2 Punkte und die Gene dazwischen werden im Chromosom verschoben
     def displacement_mutation(self, index):
-        j = 0
-        point1 = 0
         length = 0
-        point2 = 0
         tempArray1 = [0] * self.mMaxLength
         tempArray2 = [0] * self.mMaxLength
-        #thisChromo = Chromosome(self.mMaxLength)
         thisChromo = self.population[index]
 
         # Randomly choose a section to be displaced.
         point1 = random.randrange(0, self.mMaxLength)
-        #sys.stdout.write(str(point1))
-        #sys.stdout.write(str(self.mMaxLength))
 
         # Generate re-insertion point.
         candidate = self.mMaxLength - (point1 + 2)
@@ -658,15 +590,8 @@ class NQueen1:
         sys.stdout.write("Displacement Mutation verwendet.\n")
         return
 
-    #TODO wenn die eltern verschiedene crossover haben wird (evtl. mit Roulette) gewählt, welchees crossover die Nachkommen haben
+    #wenn die eltern verschiedene crossover haben wird das übernommen von dem elternteil bessere fitness hat
     def do_mating(self):
-        getRand = 0
-        parentA = 0
-        parentB = 0
-        newChildIndex1 = 0
-        newChildIndex2 = 0
-        #newChromo1 = Chromosome(self.mMaxLength)
-        #newChromo2 = Chromosome(self.mMaxLength)
 
         for i in range(self.mOffspringPerGeneration):
             parentA = self.choose_first_parent()
@@ -684,15 +609,6 @@ class NQueen1:
                     type = chromA.get_crossover()
                 else:
                     type = chromB.get_crossover()
-
-                '''
-                newChromo1 = Chromosome(self.mMaxLength)
-                newChromo2 = Chromosome(self.mMaxLength)
-                self.population.append(newChromo1)
-                newIndex1 = len(self.population) - 1
-                self.population.append(newChromo2)
-                newIndex2 = len(self.population) - 1
-                '''
 
                 print(chromA.get_fitness())
                 print(chromA.get_crossover())
@@ -752,9 +668,6 @@ class NQueen1:
 
 
     def prep_next_epoch(self):
-        popSize = 0;
-        #thisChromo = Chromosome(self.mMaxLength)
-
         # Reset flags for selected individuals.
         popSize = len(self.population)
         for i in range(popSize):
@@ -783,8 +696,7 @@ class NQueen1:
         return
 
     def genetic_algorithm(self):
-        popSize = 0
-        #thisChromo = Chromosome(self.mMaxLength)
+
         done = False
 
         self.mutations = 0
@@ -819,7 +731,7 @@ class NQueen1:
             sys.stdout.write(str(self.array_o_b) + " ARRAY_O_B\n")
 
             # This is here simply to show the runtime status.
-            sys.stdout.write("Epoch: " + str(self.epoch) + "\n")
+            sys.stdout.write("Epoche: " + str(self.epoch) + "\n")
 
         sys.stdout.write("done.\n")
         sys.stdout.write(str(max(self.array_p_m)) + " maximale Value.\n")
@@ -862,7 +774,6 @@ class NQueen1:
         x = np.arange(1, self.epoch, 1)
         sys.stdout.write(str(x) +" this is it\n")
         sys.stdout.write(str(pmarray) + " pmarray\n")
-        max_y= max(max(self.array_p_m), max(self.array_o_b), max(self.array_p_b))
         y1 = pmarray[x]
         y2 = pbarray[x]
         y3 = obarray[x]
@@ -916,18 +827,19 @@ def show_overall_permutation_amount(array):
 if __name__ == '__main__':
     array = [0, 0, 0]
     counter = 0
-    while(counter != 6):
+    while(counter != 10):
         nq1 = NQueen1(START_SIZE, MAX_EPOCHS, MATING_PROBABILITY, MUTATION_RATE, MIN_SELECT, MAX_SELECT,
                       OFFSPRING_PER_GENERATION, MINIMUM_SHUFFLES, MAXIMUM_SHUFFLES, PBC_MAX, MAX_LENGTH)
 
         nq1.initialize_chromosomes()
         nq1.genetic_algorithm()
+        #zeige pro Druchlauf permutation-Anzahl und permutationen pro Epoche
         nq1.show_permutation_amount()
         nq1.show_crossover_per_epoche()
 
         array = np.array(array) + nq1.get_best_crossover()
         counter+=1
-
+        sys.stdout.write("COUNTER: " + str(counter)+"\n")
 
     print(array)
     show_overall_permutation_amount(array)
