@@ -179,139 +179,71 @@ class NQueen1:
 
         return
 
-    # TODO methode klappt nicht ganz, es werden mehrere Boards angezeigt die nichtmal Bedingungen der Lsg entsprechen
-    def order_based_crossover(self, chromA, chromB, child1, child2):
+    def partially_mapped_crossover(self, chromA, chromB, child1, child2):
         thisChromo = chromA
         thatChromo = chromB
         newChromo1 = self.population[child1]
         newChromo2 = self.population[child2]
 
-        # Choose and sort the crossNumbers
-        # points sind die positionen in parent 1 -> dann werden die Zahlen herausgefunden und die Positionen im
-        # 2. Parent gesucht
-        numPoints = random.randrange(0, self.mPBCMax)  # if PBC_MAX is set any higher than 6 or 8.
-        points = [0] * numPoints
-        for i in range(numPoints):
-            points[i] = self.get_exclusive_random_integer_by_array(0, self.mMaxLength - 1, points)
-        points.sort()
+        crossPoint1 = random.randrange(0, self.mMaxLength)
+        crossPoint2 = self.get_exclusive_random_integer(self.mMaxLength, crossPoint1)
+        if crossPoint2 < crossPoint1:
+            j = crossPoint1
+            crossPoint1 = crossPoint2
+            crossPoint2 = j
 
-        crossNumbers = self.findCrossNumbers(numPoints, points, thisChromo)
-        crossNumbers2 = self.findCrossNumbers(numPoints, points, thatChromo)
-
-        # von Parent2 werden Positionen der Zahlen von Parent1 (in crossNumbers) gesucht und in Array cpoints
-        # gespeichert.
-        # Von den Zahlen die bei P2  den ausgewählten Zahlen in crossNumbers entsprechen werden die Positionen in
-        # einem Array gesammelt (points)
-        cpoints = self.findCPoints(numPoints, thatChromo, crossNumbers)
-        cpoints2 = self.findCPoints(numPoints, thisChromo, crossNumbers2)
-
-        # temporäres Array erzeugen mit Lücken in Positionen von cpoints/cpoint2, danach Lücken mit crossNumbers/
-        # crossNumbers2 füllen
-
-        array1 = self.fullfill(numPoints, cpoints, thatChromo, crossNumbers)
-        array2 = self.fullfill(numPoints, cpoints2, thisChromo, crossNumbers2)
-
+        # Copy Parent genes to offspring.
         for i in range(self.mMaxLength):
-            newChromo1.set_data(i, array1[i])
+            newChromo1.set_data(i, thisChromo.get_data(i))
+            newChromo2.set_data(i, thatChromo.get_data(i))
 
-        for i in range(self.mMaxLength):
-            newChromo2.set_data(i, array2[i])
+        for i in range(crossPoint1, crossPoint2 + 1):
+            # // Get the two items to swap.
+            item1 = thisChromo.get_data(i)
+            item2 = thatChromo.get_data(i)
+            pos1 = 0
+            pos2 = 0
 
-        if not points:
-            for i in range(self.mMaxLength):
-                newChromo1.set_data(i, thatChromo.get_data(i))
-                newChromo2.set_data(i, thisChromo.get_data(i))
+            # Get the items' positions in the offspring.
+            for j in range(self.mMaxLength):
+                if newChromo1.get_data(j) == item1:
+                    pos1 = j
+                elif newChromo1.get_data(j) == item2:
+                    pos2 = j
 
-        #Konsole
-        sys.stdout.write(str(points) + " Positionen der ausgewähten Zahlen\n")
-        sys.stdout.write(str(crossNumbers) + " CrossNumbers: Zahlen im 1. Parent\n")
-        sys.stdout.write(str(crossNumbers2) + " CrossNumbers2: Zahlen im 2. Parent\n")
-        sys.stdout.write(str(cpoints) + " cpoints im 2.Parent\n")
-        sys.stdout.write(str(cpoints2) + " cpoints im 1.Parent\n")
+            # Swap them.
+            if item1 != item2:
+                newChromo1.set_data(pos1, item2)
+                newChromo1.set_data(pos2, item1)
+
+            # Get the items'  positions in the offspring.
+            for j in range(self.mMaxLength):
+                if newChromo2.get_data(j) == item2:
+                    pos1 = j
+                elif newChromo2.get_data(j) == item1:
+                    pos2 = j
+
+            # Swap them.
+            if item1 != item2:
+                newChromo2.set_data(pos1, item1)
+                newChromo2.set_data(pos2, item2)
+
+        sys.stdout.write(str(crossPoint1) + " CrossPoints\n")
+        sys.stdout.write(str(crossPoint2) + " CrossPoints\n")
         sys.stdout.write("Parent1")
         thisChromo.toStr()
-        sys.stdout.write("Fitness Parent1: ")
-        print(thisChromo.get_fitness())
         sys.stdout.write("Parent2")
         thatChromo.toStr()
-        sys.stdout.write("Fitness Parent2: ")
-        print(thatChromo.get_fitness())
-        sys.stdout.write("Kind1  ")
-        newChromo1.toStr()
-        sys.stdout.write("Fitness Kind1: ")
-        print(newChromo1.get_fitness())
-        sys.stdout.write("Kind2  ")
-        newChromo2.toStr()
-        sys.stdout.write("Fitness Kind2: ")
-        print(newChromo2.get_fitness())
-        sys.stdout.write("Order-based Crossover verwendet.\n")
+
+        sys.stdout.write("Partially-maped Crossover verwendet.\nMit crossovertyp: "+str(thisChromo.get_crossover())+
+                         ", "+str(thatChromo.get_crossover())+"\nUnd fitness "+str(thisChromo.get_fitness())+
+                         ", "+str(thatChromo.get_fitness())+"\nUnd crossover der neuen: "
+                         +str(newChromo1.get_crossover())+", " + str(newChromo2.get_crossover()) + "\n")
 
         return
 
-    def findCrossNumbers(self, numPoints, points, chromosome):
 
-        crossNumbers = [0] * numPoints
-        for i in range(numPoints):
-            for j in range(self.mMaxLength):
-                if points[i] == j:
-                    crossNumbers[i] = chromosome.get_data(points[i])
 
-        return crossNumbers
-
-    def findCPoints(self, numPoints, chromosome, numbers):
-
-        cpoints = [0] * numPoints
-
-        k = 0
-        for i in range(self.mMaxLength):
-            matchFound = False
-            for j in range(numPoints):
-                if chromosome.get_data(i) == numbers[j]:
-                    matchFound = True
-
-            if matchFound == True:
-                # testen ob cpoints leer ist
-                if cpoints:
-                    # TODO diese if-Abfrage war nur quickfix
-                    if k < numPoints:
-                        cpoints[k] = i
-                        k += 1
-
-        return cpoints
-
-    def fullfill(self, numPoints, cpoints, chromosome, numbers):
-
-        tempArray = [0] * self.mMaxLength
-
-        for i in range(self.mMaxLength):
-            matchFound = False
-            for j in range(numPoints):
-                if i == cpoints[j]:
-                    matchFound = True
-                else:
-                    tempArray[i] = chromosome.get_data(i)
-
-            if matchFound == True:
-                tempArray[i] = 0
-
-        # Lücken in tempArray werden mit Zahlen von numbers aufgefüllt
-        k = 0
-        # hier wird gecheckt ob crossNumbers leer ist, wenn ja wird nichts gemacht
-        # TODO exception bearbeiten
-        if numbers:
-            for i in range(self.mMaxLength):
-                if tempArray[i] == 0:
-                    if chromosome.get_data(i) != 0:
-                        tempArray[i] = numbers[k]
-                        k += 1
-                    elif 0 in numbers:
-                        try:
-                            tempArray[i] = numbers[k]
-                            k += 1
-                        except IndexError:
-                            sys.stdout.write(str(k) + " :k, schiefgelaufen.. i: " + str(i) + "\n")
-
-        return tempArray
 
     # Verschiebungsmutatation: 2 Punkte und die Gene dazwischen werden im Chromosom verschoben
     def displacement_mutation(self, index):
@@ -372,7 +304,7 @@ class NQueen1:
             newIndex1 = len(self.population) - 1
             self.population.append(newChromo2)
             newIndex2 = len(self.population) - 1
-            self.order_based_crossover(chromA, chromB, newIndex1, newIndex2)
+            self.partially_mapped_crossover(chromA, chromB, newIndex1, newIndex2)
 
             newChromo1 = self.population[newIndex1]
             newChromo1.compute_conflicts()
