@@ -477,7 +477,7 @@ def percentage_table(p1, p2, k1, k2):
             vgl_k1_p1 += 1
             if k1[i] < p2[i]:
                 vgl_k1_beide += 1
-        elif k1[i] < p2[i]:
+        if k1[i] < p2[i]:
             vgl_k1_p2 += 1
 
         #Kind2 weniger Konflikte als Elternteil1 und/oder Elternteil2
@@ -485,7 +485,7 @@ def percentage_table(p1, p2, k1, k2):
             vgl_k2_p1 += 1
             if k2[i] < p2[i]:
                 vgl_k2_beide += 1
-        elif k2[i] < p2[i]:
+        if k2[i] < p2[i]:
             vgl_k2_p2 += 1
 
     #Berechnung der Prozente
