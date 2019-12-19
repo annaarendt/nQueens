@@ -12,7 +12,7 @@ MINIMUM_SHUFFLES = 8  # For randomizing starting chromosomes
 MAXIMUM_SHUFFLES = 20
 PBC_MAX = 4  # Maximum Position-Based Crossover points. Range: 0 < PBC_MAX < 8 (> 8 isn't good).
 
-MAX_LENGTH = 6  # chess board width.
+MAX_LENGTH = 10  # chess board width.
 
 
 class NQueen1:
@@ -481,9 +481,11 @@ class NQueen1:
         plt.ylabel('Konflikte', fontsize=16)
         plt.title('scatter plot - parents vs offsprings', fontsize=20)
         plt.show()
+        return
 
-def show_overall_conflicts(counter, p1, p2, k1, k2):
-    x = np.arange(0, counter, 1)
+
+def show_overall_conflicts(p1, p2, k1, k2):
+    x = np.arange(0, len(p1), 1)
     y1 = p1
     y2 = p2
     y3 = k1
@@ -502,9 +504,21 @@ def show_overall_conflicts(counter, p1, p2, k1, k2):
     plt.show()
     return
 
+def boxplot(p1, p2, k1, k2):
+    data_to_plot = [p1, p2, k1, k2]
+
+    fig = plt.figure(1, figsize=(9, 6))
+    ax = fig.add_subplot(111)
+    plt.ylabel("Konflikte")
+    plt.title('parents and offsprings')
+    ax.boxplot(data_to_plot)
+    ax.set_xticklabels(['Parent1', 'Parent2', 'Child1', 'Child2'])
+    plt.show()
+    return
+
 if __name__ == '__main__':
     COUNTER = 0
-    END = 30
+    END = 1000
     p1 = [0] * END
     p2 = [0] * END
     k1 = [0] * END
@@ -516,10 +530,11 @@ if __name__ == '__main__':
         nq1.initialize_chromosomes()
         nq1.genetic_algorithm()
 
-        p1[COUNTER]= nq1.get_conflict_array()[0]
+        p1[COUNTER] = nq1.get_conflict_array()[0]
         p2[COUNTER] = nq1.get_conflict_array()[1]
         k1[COUNTER] = nq1.get_conflict_array()[2]
         k2[COUNTER] = nq1.get_conflict_array()[3]
+
         #konsole_konflikte je Durchlauf
         sys.stdout.write("COUNTER: " + str(COUNTER)+"\n")
 
@@ -529,7 +544,8 @@ if __name__ == '__main__':
         COUNTER += 1
 
 
-    show_overall_conflicts(END, p1, p2, k1, k2)
+    show_overall_conflicts(p1, p2, k1, k2)
+    boxplot(p1, p2, k1, k2)
 
 
 
