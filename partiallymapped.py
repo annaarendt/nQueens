@@ -157,6 +157,7 @@ class NQueen1:
         return
 
     def get_fitness(self):
+        """""
         # Lowest errors = 100%, Highest errors = 0%
         popSize = len(self.population)
 
@@ -176,8 +177,17 @@ class NQueen1:
             else:
                 thisChromo.set_fitness((worstScore - thisChromo.get_conflicts()) * 0)
 
+        # fitness entspricht den Konflikten. Niedrige Fitness ist gut, hohe ist schlecht
+        """""
+        #fitness entspricht den Konflikten. Niedrige Fitness ist gut, hohe ist schlecht
+        popSize = len(self.population)
 
-        return
+        for i in range(popSize):
+            thisChromo = self.population[i]
+            worst = self.population[self.get_maximum()]
+            thisChromo.set_fitness(worst.get_conflicts()-thisChromo.get_conflicts())
+
+        sys.stdout.write(str(worst.get_conflicts()) + " Maximale Konflikte\n")
 
     def partially_mapped_crossover(self, chromA, chromB, child1, child2):
         thisChromo = chromA
@@ -429,7 +439,7 @@ def show_overall_conflicts(p1, p2, k1, k2):
 
     plt.ylabel("Konflikte")
     plt.xlabel("Durchläufe")
-    plt.title('parents and offsprings')
+    plt.title('parents and offsprings partiellymapped')
     plt.legend((l1, l2, l3, l4), ('parent1', 'parent2', 'child1', 'child2'))
     plt.show()
     return
@@ -476,12 +486,12 @@ def percentage_table(p1, p2, k1, k2):
             vgl_k2_p2 += 1
 
     #Berechnung der Prozente
-    k1_vs_p1 = vgl_k1_p1/len_array
-    k1_vs_p2 = vgl_k1_p2 / len_array
-    k2_vs_p1 = vgl_k2_p1 / len_array
-    k2_vs_p2 = vgl_k2_p2 / len_array
-    k1_vs_beide = vgl_k1_beide / len_array
-    k2_vs_beide = vgl_k2_beide / len_array
+    k1_vs_p1 = vgl_k1_p1/len_array * 100
+    k1_vs_p2 = vgl_k1_p2 / len_array * 100
+    k2_vs_p1 = vgl_k2_p1 / len_array * 100
+    k2_vs_p2 = vgl_k2_p2 / len_array * 100
+    k1_vs_beide = vgl_k1_beide / len_array * 100
+    k2_vs_beide = vgl_k2_beide / len_array * 100
 
     fig = plt.figure(dpi=80)
     title="Durchgänge = "+str(len_array)
