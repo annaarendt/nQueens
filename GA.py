@@ -6,7 +6,7 @@ import numpy as np
 from Chromosome import Chromosome
 
 START_SIZE = 75  # Population size at start.
-MAX_EPOCHS = 1000  # Arbitrary number of test cycles. Default 1000!
+MAX_EPOCHS = 40  # Arbitrary number of test cycles. Default 1000!
 MATING_PROBABILITY = 0.7  # Probability of two chromosomes mating. Range: 0.0 < MATING_PROBABILITY < 1.0
 MUTATION_RATE = 0.001  # Mutation Rate. Range: 0.0 < MUTATION_RATE < 1.0
 MIN_SELECT = 10  # Minimum parents allowed for selection.
@@ -18,13 +18,10 @@ MINIMUM_SHUFFLES = 8  # For randomizing starting chromosomes
 MAXIMUM_SHUFFLES = 20
 PBC_MAX = 4  # Maximum Position-Based Crossover points. Range: 0 < PBC_MAX < 8 (> 8 isn't good).
 
-MAX_LENGTH = 10 # chess board width.
+MAX_LENGTH = 8 # chess board width.
 
 
-#anderer code:
-#zwei inidvuduen, fitness, rekombinierenm fitness von kindern messsen -> daraus nachkommen, sind die besser? aber weiter gestreut von fitness her?
-#wekcher crossover für welche phase besser
-#einen richtigen crossover - positionbased ist n-Crossover
+#welcher crossover für welche phase besser
 #mutaion von corssover und crossover fixen, auf viele durchgänge testen
 #eine schlechte rekombinationsmethode implementieren zum testen
 
@@ -189,41 +186,66 @@ class NQueen1:
         return
 
     def get_fitness(self):
+        """""
         # Lowest errors = 100%, Highest errors = 0%
         popSize = len(self.population)
 
         # The worst score would be the one with the highest energy, best would be lowest.
         thisChromo = self.population[self.get_maximum()]
+        sys.stdout.write(str(thisChromo.get_conflicts()) + " Maximale Konflikte\n")
         worstScore = thisChromo.get_conflicts()
 
         # Convert to a weighted percentage.
         thisChromo = self.population[self.get_minimum()]
+        sys.stdout.write(str(thisChromo.get_conflicts()) + " Minimale Konflikte\n")
+        #bestScore ist die bandbreite der Konflikte. Maximale minus minimale Anzahl an Konflikten
         bestScore = worstScore - thisChromo.get_conflicts()
+        sys.stdout.write(str(bestScore) + " bestscore\n")
 
+        #die wenigsten Konflikte: Fitness ist 100, die meisten: Fitness ist 0
         for i in range(popSize):
             thisChromo = self.population[i]
             thisChromo.set_fitness((worstScore - thisChromo.get_conflicts()) * 100.0 / bestScore)
-        print(thisChromo.get_conflicts())
+        """""
+
+        #fitness entspricht den Konflikten. Niedrige Fitness ist gut, hohe ist schlecht
+        popSize = len(self.population)
+
+        for i in range(popSize):
+            thisChromo = self.population[i]
+            worst = self.population[self.get_maximum()]
+            thisChromo.set_fitness(worst.get_conflicts()-thisChromo.get_conflicts())
+
+        sys.stdout.write(str(worst.get_conflicts()) + " Maximale Konflikte\n")
+
 
         return
 
-    #Selektion der Eltern mit Roulette-Methode. Je mehr Fitness, desto mehr Anteil auf dem Roulette
+    #Selektion der Eltern mit Roulette-Methode. Je besser (kleiner) Fitness, desto mehr Anteil auf dem Roulette
     def roulette_selection(self):
         genTotal = 0.0
-
+        sumProp = 0.0
         popSize = len(self.population)
+
         for i in range(popSize):
             thisChromo = self.population[i]
             genTotal += thisChromo.get_fitness()
 
-        genTotal *= 0.01
+        sys.stdout.write(str(genTotal) + " GenTotal(Roulette)\n")
+        sys.stdout.write(str(popSize) + " popSize\n")
 
         for i in range(popSize):
             thisChromo = self.population[i]
-            thisChromo.set_selection_probability(thisChromo.get_fitness() / genTotal)
+            sys.stdout.write(str(thisChromo.get_fitness()) + " fitness\n")
+            propability = (thisChromo.get_fitness() / genTotal)
+            sumProp += propability
+            thisChromo.set_selection_probability(propability)
+            sys.stdout.write(str(propability) + " propability von chromosom\n")
+
+        sys.stdout.write(str(sumProp) + " alle Props\n")
 
         for i in range(self.mOffspringPerGeneration):
-            rouletteSpin = random.randrange(0, 99)
+            rouletteSpin = random.uniform(0, 1)
             j = 0
             selTotal = 0
             done = False
@@ -242,7 +264,6 @@ class NQueen1:
                     done = True
                 else:
                     j += 1
-
         return
 
     def choose_first_parent(self):
@@ -326,6 +347,7 @@ class NQueen1:
         sys.stdout.write("Parent1")
         thisChromo.toStr()
         sys.stdout.write("Parent2")
+        sys.stdout.write(" hat "+str(thatChromo.get_conflicts())+" Konflikte\n")
         thatChromo.toStr()
 
         sys.stdout.write("Partially-maped Crossover verwendet.\nMit crossovertyp: "+str(thisChromo.get_crossover())+
@@ -828,7 +850,7 @@ def show_overall_permutation_amount(array):
 if __name__ == '__main__':
     array = [0, 0, 0]
     counter = 0
-    while(counter != 1):
+    while(counter != 3):
         sys.stdout.write("COUNTER: " + str(counter)+"\n")
         nq1 = NQueen1(START_SIZE, MAX_EPOCHS, MATING_PROBABILITY, MUTATION_RATE, MIN_SELECT, MAX_SELECT,
                       OFFSPRING_PER_GENERATION, MINIMUM_SHUFFLES, MAXIMUM_SHUFFLES, PBC_MAX, MAX_LENGTH)
