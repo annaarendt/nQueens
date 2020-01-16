@@ -157,29 +157,7 @@ class NQueen1:
         return
 
     def get_fitness(self):
-        """""
-        # Lowest errors = 100%, Highest errors = 0%
-        popSize = len(self.population)
-
-        # The worst score would be the one with the highest energy, best would be lowest.
-        thisChromo = self.population[self.get_maximum()]
-        worstScore = thisChromo.get_conflicts()
-
-        # Convert to a weighted percentage.
-        thisChromo = self.population[self.get_minimum()]
-        bestScore = worstScore - thisChromo.get_conflicts()
-        sys.stdout.write("bestScore = worstScore - thisChromo.get_conflicts(): "+str(bestScore)+" = "+str(worstScore)+" - "+str(thisChromo.get_conflicts())+"\n")
-
-        for i in range(popSize):
-            thisChromo = self.population[i]
-            if(bestScore!=0):
-                thisChromo.set_fitness((worstScore - thisChromo.get_conflicts()) * 100.0 / bestScore)
-            else:
-                thisChromo.set_fitness((worstScore - thisChromo.get_conflicts()) * 0)
-
-        # fitness entspricht den Konflikten. Niedrige Fitness ist gut, hohe ist schlecht
-         """""
-        #fitness entspricht den Konflikten. Niedrige Fitness ist gut, hohe ist schlecht
+        #fitness entspricht den Konflikten.
         popSize = len(self.population)
 
         for i in range(popSize):
@@ -526,7 +504,7 @@ def percentage_table(p1, p2, k1, k2):
 
 if __name__ == '__main__':
     COUNTER = 0
-    END = 5000
+    END = 50000
     p1 = [0] * END
     p2 = [0] * END
     k1 = [0] * END
