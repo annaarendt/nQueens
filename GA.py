@@ -185,38 +185,21 @@ class NQueen1:
 
         return
 
+    #funktion wird nicht mehr gebraucht, da konflikte als Fitness dienen. Zeigt nun lediglich den aktuellen
+    #Stand der Konflikte am Anfang jeder epoche an.
     def get_fitness(self):
-        """""
-        # Lowest errors = 100%, Highest errors = 0%
-        popSize = len(self.population)
-
-        # The worst score would be the one with the highest energy, best would be lowest.
-        thisChromo = self.population[self.get_maximum()]
-        sys.stdout.write(str(thisChromo.get_conflicts()) + " Maximale Konflikte\n")
-        worstScore = thisChromo.get_conflicts()
-
-        # Convert to a weighted percentage.
-        thisChromo = self.population[self.get_minimum()]
-        sys.stdout.write(str(thisChromo.get_conflicts()) + " Minimale Konflikte\n")
-        #bestScore ist die bandbreite der Konflikte. Maximale minus minimale Anzahl an Konflikten
-        bestScore = worstScore - thisChromo.get_conflicts()
-        sys.stdout.write(str(bestScore) + " bestscore\n")
-
-        #die wenigsten Konflikte: Fitness ist 100, die meisten: Fitness ist 0
-        for i in range(popSize):
-            thisChromo = self.population[i]
-            thisChromo.set_fitness((worstScore - thisChromo.get_conflicts()) * 100.0 / bestScore)
-        """""
-
         #fitness entspricht den Konflikten. Niedrige Fitness ist gut, hohe ist schlecht
         popSize = len(self.population)
+        sys.stdout.write(str(len(self.population)) + " Länge der Population..Konflikte:\n")
 
         for i in range(popSize):
             thisChromo = self.population[i]
             worst = self.population[self.get_maximum()]
             thisChromo.set_fitness(worst.get_conflicts()-thisChromo.get_conflicts())
+            sys.stdout.write(str(thisChromo.get_conflicts())
+                             + ", ")
 
-        sys.stdout.write(str(worst.get_conflicts()) + " Maximale Konflikte\n")
+        sys.stdout.write("\n"+str(worst.get_conflicts()) + " Maximale Konflikte\n")
 
 
         return
@@ -228,19 +211,27 @@ class NQueen1:
         popSize = len(self.population)
 
         for i in range(popSize):
+            worst = self.population[self.get_maximum()]
             thisChromo = self.population[i]
-            genTotal += thisChromo.get_fitness()
+            #zählt quasi die Fitness aller Chromosomen zusammen (abgezogen von Indivuduum mit höchstem Konfliktwert)
+            genTotal += (worst.get_conflicts()-thisChromo.get_conflicts())
 
         sys.stdout.write(str(genTotal) + " GenTotal(Roulette)\n")
         sys.stdout.write(str(popSize) + " popSize\n")
 
         for i in range(popSize):
+            worst = self.population[self.get_maximum()]
+
             thisChromo = self.population[i]
-            sys.stdout.write(str(thisChromo.get_fitness()) + " fitness\n")
-            propability = (thisChromo.get_fitness() / genTotal)
-            sumProp += propability
-            thisChromo.set_selection_probability(propability)
-            sys.stdout.write(str(propability) + " propability von chromosom\n")
+            sys.stdout.write(str(thisChromo.get_conflicts()) + " Konflikte\n")
+            if genTotal != 0:
+                probability = ((worst.get_conflicts()-thisChromo.get_conflicts()) / genTotal)
+            else:
+                probability = 0
+            sys.stdout.write("("+str(worst.get_conflicts()) + " - "+str(thisChromo.get_conflicts())+ ") / "+str(genTotal)+" =\n")
+            sumProp += probability
+            thisChromo.set_selection_probability(probability)
+            sys.stdout.write(str(probability) + " probability von chromosom\n")
 
         sys.stdout.write(str(sumProp) + " alle Props\n")
 
@@ -264,6 +255,21 @@ class NQueen1:
                     done = True
                 else:
                     j += 1
+                #wenn j startsize ist , wird das letzte Individuum als Elternteil genommen und das davor
+                #TODO Fehlerquelle: wenn nicht bei allen nahckommensdurchläufen 75 erreicht wird, werden zuviele
+                #TODO seletiert und das ziemlich random
+                if j>=START_SIZE:
+                    thatChromo = self.population[j-1]
+                    thatChromo2 = self.population[j-2]
+                    thatChromo.set_selected(True)
+                    thatChromo2.set_selected(True)
+                    done = True
+                #wenn nur noch Individuen mit 0 Konflikten vorhanden sind, werden aktuelles Induviduuum und das danach
+                #ausgewählt
+                if sumProp == 0:
+                    self.population[j].set_selected(True)
+                    self.population[j+1].set_selected(True)
+                    done = True
         return
 
     def choose_first_parent(self):
@@ -284,14 +290,116 @@ class NQueen1:
         done = False
 
         while not done:
+            print("in choose second parent angekommen")
             # Randomly choose an eligible parent.
             parentB = random.randrange(0, len(self.population) - 1)
             if parentB != parentA:
                 thisChromo = self.population[parentB]
+                sys.stdout.write(str(thisChromo.get_selected())+"\n")
                 if thisChromo.get_selected() == True:
                     done = True
-
         return parentB
+
+    def bad_recombination(self, chromA, chromB, child1, child2):
+        tempArray1 = [0] * self.mMaxLength
+        tempArray2 = [0] * self.mMaxLength
+        thisChromo = chromA
+        thatChromo = chromB
+        newChromo1 = self.population[child1]
+        newChromo2 = self.population[child2]
+
+        # Choose and sort the crosspoints.
+        numPoints = random.randrange(0, self.mPBCMax)  # if PBC_MAX is set any higher than 6 or 8.
+        crossPoints = [0] * numPoints
+        for i in range(numPoints):
+            crossPoints[i] = self.get_exclusive_random_integer_by_array(0, self.mMaxLength - 1, crossPoints)
+        # Get non-chosens from parent 2: Die Zahlen die bei P2 nicht an den ausgewählten Stellen bei P1 stehen werden in
+        # einem Array gesammelt (tempArray1)
+        k = 0
+        for i in range(self.mMaxLength):
+            matchFound = False
+            for j in range(numPoints):
+                if thatChromo.get_data(i) == thisChromo.get_data(crossPoints[j]):
+                    matchFound = True
+
+            if matchFound == False:
+                tempArray1[k] = thatChromo.get_data(i)
+                k += 1
+        # Insert chosens into child 1: in Child 1 werden die Zahlen von P1 an gewählter Position gesetzt, Rest
+        # freigelassen
+        for i in range(numPoints):
+            newChromo1.set_data(crossPoints[i], thisChromo.get_data(crossPoints[i]))
+
+        # Fill in non-chosens to child 1.
+        k = 0
+        for i in range(self.mMaxLength):
+            matchFound = False
+            for j in range(numPoints):
+                if i == crossPoints[j]:
+                    matchFound = True
+
+            if matchFound == False:
+                newChromo1.set_data(i, tempArray1[k])
+                k += 1
+        newChromo1.compute_conflicts()
+
+        #Kind1 wird rausgehauen und index child2 um eins heragesetzt weil sich population auch wieder ändert
+        if newChromo1.get_conflicts()<thisChromo.get_conflicts() or newChromo1.get_conflicts()<thatChromo.get_conflicts():
+            sys.stdout.write("Länge population vorm raushauen: " + str(len(self.population))+"\n")
+            self.population.pop(child1)
+            sys.stdout.write(str(child1)+" kind1 wurde rausgehauen, Länge population: "+str(len(self.population))+"\n")
+            child2 = child2-1
+
+        sys.stdout.write(str(crossPoints) + " CrossPoints\n")
+        sys.stdout.write("Parent1 mit Konflikten " + str(thisChromo.get_conflicts()))
+        thisChromo.toStr()
+        sys.stdout.write("Parent2 mit Konflikten " + str(thatChromo.get_conflicts()))
+        thatChromo.toStr()
+        sys.stdout.write("Kind1 Konflikten " + str(newChromo1.get_conflicts()))
+        newChromo1.toStr()
+#
+        # Get non-chosens from parent 1
+        k = 0
+        for i in range(self.mMaxLength):
+            matchFound = False
+            for j in range(numPoints):
+                if thisChromo.get_data(i) == thatChromo.get_data(crossPoints[j]):
+                    matchFound = True
+
+            if matchFound == False:
+                tempArray2[k] = thisChromo.get_data(i)
+                k += 1
+
+        # Insert chosens into child 2.
+        for i in range(numPoints):
+            newChromo2.set_data(crossPoints[i], thatChromo.get_data(crossPoints[i]))
+
+        # Fill in non-chosens to child 2.
+        k = 0
+        for i in range(self.mMaxLength):
+            matchFound = False
+            for j in range(numPoints):
+                if i == crossPoints[j]:
+                    matchFound = True
+
+            if matchFound == False:
+                newChromo2.set_data(i, tempArray2[k])
+                k += 1
+
+        newChromo2.compute_conflicts()
+
+        if newChromo2.get_conflicts()<thisChromo.get_conflicts() or newChromo2.get_conflicts()<thatChromo.get_conflicts():
+            sys.stdout.write("Länge population vorm raushauen: " + str(len(self.population))+"\n")
+            sys.stdout.write("Child2: " + str(child2) + "\n")
+            self.population.pop(child2)
+            sys.stdout.write(str(child2)+" kind2 wurde rausgehauen, Länge population: "+str(len(self.population))+"\n")
+
+        sys.stdout.write("BAD_recombination verwendet.\nMit crossovertyp: "+str(thisChromo.get_crossover())+
+                         ", "+str(thatChromo.get_crossover())+"\nUnd konflikte "+str(thisChromo.get_conflicts())+
+                         ", "+str(thatChromo.get_conflicts())+"\nUnd crossover der neuen: "
+                         +str(newChromo1.get_crossover())+", " + str(newChromo2.get_crossover()) + "\n")
+        return
+
 
     def partially_mapped_crossover(self, chromA, chromB, child1, child2):
         thisChromo = chromA
@@ -351,8 +459,8 @@ class NQueen1:
         thatChromo.toStr()
 
         sys.stdout.write("Partially-maped Crossover verwendet.\nMit crossovertyp: "+str(thisChromo.get_crossover())+
-                         ", "+str(thatChromo.get_crossover())+"\nUnd fitness "+str(thisChromo.get_fitness())+
-                         ", "+str(thatChromo.get_fitness())+"\nUnd crossover der neuen: "
+                         ", "+str(thatChromo.get_crossover())+"\nUnd konflikte "+str(thisChromo.get_conflicts())+
+                         ", "+str(thatChromo.get_conflicts())+"\nUnd crossover der neuen: "
                          +str(newChromo1.get_crossover())+", " + str(newChromo2.get_crossover()) + "\n")
 
         return
@@ -614,28 +722,24 @@ class NQueen1:
 
     #wenn die eltern verschiedene crossover haben wird das übernommen von dem elternteil bessere fitness hat
     def do_mating(self):
-
         for i in range(self.mOffspringPerGeneration):
+            print("for schleife in mating")
             parentA = self.choose_first_parent()
             # Test probability of mating.
             getRand = random.randrange(0, 100)
 
             if getRand <= self.mMatingProbability * 100:
+                print ("im ersten if, mating")
                 parentB = self.choose_second_parent(parentA)
-
+                print("parents gefunden, mating")
                 #das crossover des Elternteils mit größerer Fitness wird gewählt
                 chromA = self.population[parentA]
                 chromB = self.population[parentB]
 
-                if chromA.get_fitness() > chromB.get_fitness():
+                if chromA.get_conflicts() < chromB.get_conflicts():
                     type = chromA.get_crossover()
                 else:
                     type = chromB.get_crossover()
-
-                print(chromA.get_fitness())
-                print(chromA.get_crossover())
-                print(chromB.get_fitness())
-                chromB.toStr()
 
                 if type == 0:
                     newChromo1 = Chromosome(self.mMaxLength, 0)
@@ -654,7 +758,8 @@ class NQueen1:
                     newIndex1 = len(self.population) - 1
                     self.population.append(newChromo2)
                     newIndex2 = len(self.population) - 1
-                    self.position_based_crossover(chromA, chromB, newIndex1, newIndex2)
+                    # entweder positionbased crossover oder bad_recombination, beides crossover-typ 1
+                    self.bad_recombination(chromA, chromB, newIndex1, newIndex2)
                     self.position_based_co += 1
                     self.current_p_b += 1
                 else:
@@ -675,12 +780,29 @@ class NQueen1:
                     #self.exchange_mutation(newIndex2, 1)
                     self.displacement_mutation(newIndex2)
 
-                newChromo1 = self.population[newIndex1]
-                newChromo1.compute_conflicts()
-                newChromo2 = self.population[newIndex2]
-                newChromo2.compute_conflicts()
 
-                self.childCount += 2
+                #Fehler muss abgenafangen werden weil bei bad recombination kinder wieder rausgelöscht werden
+                try:
+                    newChromo1.compute_conflicts()
+                    newChromo1 = self.population[newIndex1]
+                    sys.stdout.write("Kind1 mit Konflikte " + str(newChromo1.get_conflicts()))
+                    newChromo1.toStr()
+                    self.childCount += 1
+                except IndexError:
+                    print("INDEXERROR, newIndex1 gibt es nicht")
+                try:
+                    newChromo2.compute_conflicts()
+                    newChromo2 = self.population[newIndex2]
+                    sys.stdout.write("Kind2 mit Konflikte " + str(newChromo2.get_conflicts()))
+                    newChromo2.toStr()
+                    self.childCount += 1
+                except IndexError:
+                    print("INDEXERROR, newIndex1 gibt es nicht")
+
+                sys.stdout.write("Parent1 mit Konflikte " + str(chromA.get_conflicts()))
+                chromA.toStr()
+                sys.stdout.write("Parent2 mit Konflikte " + str(chromB.get_conflicts()))
+                chromB.toStr()
 
                 # Schedule next mutation.
                 if math.fmod(self.childCount, self.math_round(1.0 / self.mMutationRate)) == 0:
@@ -690,8 +812,20 @@ class NQueen1:
 
 
     def prep_next_epoch(self):
-        # Reset flags for selected individuals.
         popSize = len(self.population)
+        sys.stdout.write(str(len(self.population)) + " :Länge der Population..in prep next epoch 1.0\n")
+        #schlechten Individuen rauslöschen und Zahl der Population wieder auf Startzahl anpassen
+
+        for i in range(popSize):
+            while len(self.population) > START_SIZE:
+                #worst=self.population[self.get_maximum()]
+                #sys.stdout.write(str(self.population[self.get_maximum()].get_conflicts()) + " KONFLIKTE DES SCHELCHTESTEN\n")
+                self.population.pop(self.get_maximum())
+
+        sys.stdout.write(str(len(self.population)) + " :Länge der Population..in prep next epoch 2.0\n")
+
+        popSize = len(self.population)
+        # Reset flags for selected individuals.
         for i in range(popSize):
             thisChromo = self.population[i]
             thisChromo.set_selected(False)
@@ -850,7 +984,7 @@ def show_overall_permutation_amount(array):
 if __name__ == '__main__':
     array = [0, 0, 0]
     counter = 0
-    while(counter != 3):
+    while(counter != 10):
         sys.stdout.write("COUNTER: " + str(counter)+"\n")
         nq1 = NQueen1(START_SIZE, MAX_EPOCHS, MATING_PROBABILITY, MUTATION_RATE, MIN_SELECT, MAX_SELECT,
                       OFFSPRING_PER_GENERATION, MINIMUM_SHUFFLES, MAXIMUM_SHUFFLES, PBC_MAX, MAX_LENGTH)
