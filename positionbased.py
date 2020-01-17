@@ -296,9 +296,6 @@ class NQueen1:
             chromA = self.population[0]
             chromB = self.population[1]
 
-            sys.stdout.write(str(chromA.get_fitness()) + " :Fitness ChromA\n")
-            sys.stdout.write(str(chromB.get_fitness()) + " :Fitness ChromB\n")
-
             newChromo1 = Chromosome(self.mMaxLength, 0)
             newChromo2 = Chromosome(self.mMaxLength, 0)
             self.population.append(newChromo1)
@@ -377,8 +374,6 @@ class NQueen1:
                 thisChromo = self.population[i]
                 if thisChromo.get_conflicts() == 0 or self.epoch == self.mEpochs:
                     done = True
-
-            self.get_fitness()
 
             self.do_mating()
 
@@ -504,7 +499,7 @@ def percentage_table(p1, p2, k1, k2):
 
 if __name__ == '__main__':
     COUNTER = 0
-    END = 50000
+    END = 5000
     p1 = [0] * END
     p2 = [0] * END
     k1 = [0] * END

@@ -219,20 +219,20 @@ class NQueen1:
         sys.stdout.write(str(cpoints2) + " cpoints im 1.Parent\n")
         sys.stdout.write("Parent1")
         thisChromo.toStr()
-        sys.stdout.write("Fitness Parent1: ")
-        print(thisChromo.get_fitness())
+        sys.stdout.write("Konlikte Parent1: ")
+        print(thisChromo.get_conflicts())
         sys.stdout.write("Parent2")
         thatChromo.toStr()
-        sys.stdout.write("Fitness Parent2: ")
-        print(thatChromo.get_fitness())
+        sys.stdout.write("Konlikte  Parent2: ")
+        print(thatChromo.get_conflicts())
         sys.stdout.write("Kind1  ")
         newChromo1.toStr()
-        sys.stdout.write("Fitness Kind1: ")
-        print(newChromo1.get_fitness())
+        sys.stdout.write("Konlikte  Kind1: ")
+        print(newChromo1.get_conflicts())
         sys.stdout.write("Kind2  ")
         newChromo2.toStr()
-        sys.stdout.write("Fitness Kind2: ")
-        print(newChromo2.get_fitness())
+        sys.stdout.write("Konlikte  Kind2: ")
+        print(newChromo2.get_conflicts())
         sys.stdout.write("Order-based Crossover verwendet.\n")
 
         return
@@ -352,9 +352,6 @@ class NQueen1:
             chromA = self.population[0]
             chromB = self.population[1]
 
-            sys.stdout.write(str(chromA.get_fitness()) + " :Fitness ChromA\n")
-            sys.stdout.write(str(chromB.get_fitness()) + " :Fitness ChromB\n")
-
             newChromo1 = Chromosome(self.mMaxLength, 0)
             newChromo2 = Chromosome(self.mMaxLength, 0)
             self.population.append(newChromo1)
@@ -433,8 +430,6 @@ class NQueen1:
                 thisChromo = self.population[i]
                 if thisChromo.get_conflicts() == 0 or self.epoch == self.mEpochs:
                     done = True
-
-            self.get_fitness()
 
             self.do_mating()
 

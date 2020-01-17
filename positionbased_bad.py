@@ -212,10 +212,12 @@ class NQueen1:
 
         # Kind1 wird rausgehauen und index child2 um eins heragesetzt weil sich population auch wieder ändert
         if newChromo1.get_conflicts() < thisChromo.get_conflicts() or newChromo1.get_conflicts() < thatChromo.get_conflicts():
-            sys.stdout.write("Länge population vorm raushauen: " + str(len(self.population)) + "\n")
+            sys.stdout.write("!!! Kind1 Konflikten " + str(newChromo1.get_conflicts())+ "\n")
+            sys.stdout.write("!!! Parent1 mit Konflikten " + str(thisChromo.get_conflicts())+ "\n")
+            sys.stdout.write("!!! Parent2 mit Konflikten " + str(thatChromo.get_conflicts())+ "\n")
             self.population.pop(child1)
             sys.stdout.write(
-                str(child1) + " kind1 wurde rausgehauen, Länge population: " + str(len(self.population)) + "\n")
+                str(child1) + ".stelle, kind1 wurde rausgehauen, Länge population: " + str(len(self.population)) + "\n")
             child2 = child2 - 1
 
         sys.stdout.write(str(crossPoints) + " CrossPoints\n")
@@ -262,6 +264,14 @@ class NQueen1:
             self.population.pop(child2)
             sys.stdout.write(
                 str(child2) + " kind2 wurde rausgehauen, Länge population: " + str(len(self.population)) + "\n")
+
+        sys.stdout.write(str(crossPoints) + " CrossPoints\n")
+        sys.stdout.write("Parent1 mit Konflikten " + str(thisChromo.get_conflicts()))
+        thisChromo.toStr()
+        sys.stdout.write("Parent2 mit Konflikten " + str(thatChromo.get_conflicts()))
+        thatChromo.toStr()
+        sys.stdout.write("Kind2 Konflikten " + str(newChromo2.get_conflicts()))
+        newChromo1.toStr()
 
         sys.stdout.write("BAD_recombination verwendet.\nMit crossovertyp: " + str(thisChromo.get_crossover()) +
                          ", " + str(thatChromo.get_crossover()) + "\nUnd konflikte " + str(thisChromo.get_conflicts()) +
@@ -319,9 +329,6 @@ class NQueen1:
             chromA = self.population[0]
             chromB = self.population[1]
 
-            sys.stdout.write(str(chromA.get_fitness()) + " :Fitness ChromA\n")
-            sys.stdout.write(str(chromB.get_fitness()) + " :Fitness ChromB\n")
-
             newChromo1 = Chromosome(self.mMaxLength, 0)
             newChromo2 = Chromosome(self.mMaxLength, 0)
             self.population.append(newChromo1)
@@ -334,24 +341,30 @@ class NQueen1:
             try:
                 newChromo1.compute_conflicts()
                 newChromo1 = self.population[newIndex1]
-                sys.stdout.write("Kind1 mit Konflikte " + str(newChromo1.get_conflicts()))
+                sys.stdout.write("mating: Kind1 mit Konflikte " + str(newChromo1.get_conflicts()))
                 newChromo1.toStr()
                 self.childCount += 1
+                conflicts_child1=newChromo1.get_conflicts()
             except IndexError:
                 print("INDEXERROR, newIndex1 gibt es nicht")
+                #Konflikte auf 30 gesetzt, damit Kind in jedem fall schlechter ist
+                conflicts_child1 = 30
             try:
                 newChromo2.compute_conflicts()
                 newChromo2 = self.population[newIndex2]
-                sys.stdout.write("Kind2 mit Konflikte " + str(newChromo2.get_conflicts()))
+                sys.stdout.write("mating: Kind2 mit Konflikte " + str(newChromo2.get_conflicts()))
                 newChromo2.toStr()
                 self.childCount += 1
+                conflicts_child2 = newChromo2.get_conflicts()
             except IndexError:
-                print("INDEXERROR, newIndex1 gibt es nicht")
+                print("INDEXERROR, newIndex2 gibt es nicht")
+                #Konflikte auf 30 gesetzt, damit Kind in jedem fall schlechter ist
+                conflicts_child2 = 30
 
             sys.stdout.write(str(len(self.population)) + " Länge der Population\n")
 
             self.set_conflict_array(chromA.get_conflicts(), chromB.get_conflicts(),
-             newChromo1.get_conflicts(), newChromo2.get_conflicts())
+             conflicts_child1, conflicts_child2)
             # plot für jeden einzelnen Druchgang
             #self.show_conflicts(chromA, chromB, newChromo1, newChromo2)
 
@@ -403,8 +416,6 @@ class NQueen1:
                 thisChromo = self.population[i]
                 if thisChromo.get_conflicts() == 0 or self.epoch == self.mEpochs:
                     done = True
-
-            self.get_fitness()
 
             self.do_mating()
 
@@ -530,7 +541,7 @@ def percentage_table(p1, p2, k1, k2):
 
 if __name__ == '__main__':
     COUNTER = 0
-    END = 50000
+    END = 5000
     p1 = [0] * END
     p2 = [0] * END
     k1 = [0] * END
@@ -542,7 +553,7 @@ if __name__ == '__main__':
         nq1.initialize_chromosomes()
         nq1.genetic_algorithm()
 
-        p1[COUNTER]= nq1.get_conflict_array()[0]
+        p1[COUNTER] = nq1.get_conflict_array()[0]
         p2[COUNTER] = nq1.get_conflict_array()[1]
         k1[COUNTER] = nq1.get_conflict_array()[2]
         k2[COUNTER] = nq1.get_conflict_array()[3]

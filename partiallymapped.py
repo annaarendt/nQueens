@@ -224,8 +224,8 @@ class NQueen1:
         thatChromo.toStr()
 
         sys.stdout.write("Partially-maped Crossover verwendet.\nMit crossovertyp: "+str(thisChromo.get_crossover())+
-                         ", "+str(thatChromo.get_crossover())+"\nUnd fitness "+str(thisChromo.get_fitness())+
-                         ", "+str(thatChromo.get_fitness())+"\nUnd crossover der neuen: "
+                         ", "+str(thatChromo.get_crossover())+"\nUnd Konflikte "+str(thisChromo.get_conflicts())+
+                         ", "+str(thatChromo.get_conflicts())+"\nUnd crossover der neuen: "
                          +str(newChromo1.get_crossover())+", " + str(newChromo2.get_crossover()) + "\n")
 
         return
@@ -282,9 +282,6 @@ class NQueen1:
         for i in range(self.mOffspringPerGeneration):
             chromA = self.population[0]
             chromB = self.population[1]
-
-            sys.stdout.write(str(chromA.get_fitness()) + " :Fitness ChromA\n")
-            sys.stdout.write(str(chromB.get_fitness()) + " :Fitness ChromB\n")
 
             newChromo1 = Chromosome(self.mMaxLength, 0)
             newChromo2 = Chromosome(self.mMaxLength, 0)
@@ -364,8 +361,6 @@ class NQueen1:
                 thisChromo = self.population[i]
                 if thisChromo.get_conflicts() == 0 or self.epoch == self.mEpochs:
                     done = True
-
-            self.get_fitness()
 
             self.do_mating()
 
