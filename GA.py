@@ -18,7 +18,7 @@ MINIMUM_SHUFFLES = 8  # For randomizing starting chromosomes
 MAXIMUM_SHUFFLES = 20
 PBC_MAX = 4  # Maximum Position-Based Crossover points. Range: 0 < PBC_MAX < 8 (> 8 isn't good).
 
-MAX_LENGTH = 8 # chess board width.
+MAX_LENGTH = 10 # chess board width.
 
 
 #welcher crossover für welche phase besser
@@ -195,7 +195,6 @@ class NQueen1:
         for i in range(popSize):
             thisChromo = self.population[i]
             worst = self.population[self.get_maximum()]
-            thisChromo.set_fitness(worst.get_conflicts()-thisChromo.get_conflicts())
             sys.stdout.write(str(thisChromo.get_conflicts())
                              + ", ")
 
@@ -251,10 +250,13 @@ class NQueen1:
                     else:
                         thatChromo = self.population[j - 1]
 
+                    sys.stdout.write("im while eins selected\n")
                     thatChromo.set_selected(True)
                     done = True
                 else:
                     j += 1
+
+                """""
                 #wenn j startsize ist , wird das letzte Individuum als Elternteil genommen und das davor
                 #TODO Fehlerquelle: wenn nicht bei allen nahckommensdurchläufen 75 erreicht wird, werden zuviele
                 #TODO seletiert und das ziemlich random
@@ -264,12 +266,14 @@ class NQueen1:
                     thatChromo.set_selected(True)
                     thatChromo2.set_selected(True)
                     done = True
-                #wenn nur noch Individuen mit 0 Konflikten vorhanden sind, werden aktuelles Induviduuum und das danach
-                #ausgewählt
+                    """""
+                #wenn nur noch Individuen mit 0 Konflikten vorhanden sind, immer die Chromosomen mit jeweiliger zahl
+                #der anzahl an Nachwüchsen selected
                 if sumProp == 0:
-                    self.population[j].set_selected(True)
-                    self.population[j+1].set_selected(True)
+                    self.population[i].set_selected(True)
+                    sys.stdout.write("im while i selected\n")
                     done = True
+
         return
 
     def choose_first_parent(self):
@@ -291,13 +295,28 @@ class NQueen1:
 
         while not done:
             print("in choose second parent angekommen")
+            #test um zu sehen wieviele Chromosomen in eine rPopulation seleced wurden (wenn nur einer, dann Grund warum
+            #sich schleife aufhängt
+            probe_counter = 0
+            for i in range (len(self.population)):
+                if self.population[i].get_selected() == True:
+                    probe_counter += 1
+                    sys.stdout.write(str(probe_counter) + ".Chromosom ist Selected.\n")
+
             # Randomly choose an eligible parent.
             parentB = random.randrange(0, len(self.population) - 1)
             if parentB != parentA:
                 thisChromo = self.population[parentB]
                 sys.stdout.write(str(thisChromo.get_selected())+"\n")
                 if thisChromo.get_selected() == True:
+                    sys.stdout.write("2. parent gefunden\n")
                     done = True
+            #im Falle, dass nur ein Chromosom selected wurde (im Falle von alle Konflikte sind 0), wird ein zufälliges
+            #Chromosom als zweiten Parent gewählt
+                elif probe_counter < 2:
+                    sys.stdout.write("2. parent gefunden durch Schleifenaufhängung\n")
+                    done = True
+
         return parentB
 
     def bad_recombination(self, chromA, chromB, child1, child2):
@@ -773,12 +792,16 @@ class NQueen1:
                     self.order_based_co += 1
                     self.current_o_b += 1
 
+
+                #mutation erstmal ausgeklammert, da nicht wichtig für rekombinationsbeobachtung
+                """""
                 if self.childCount - 1 == self.nextMutation:
                     #self.exchange_mutation(newIndex1, 1)
                     self.displacement_mutation(newIndex1)
                 elif self.childCount == self.nextMutation:
                     #self.exchange_mutation(newIndex2, 1)
                     self.displacement_mutation(newIndex2)
+                """
 
 
                 #Fehler muss abgenafangen werden weil bei bad recombination kinder wieder rausgelöscht werden
