@@ -943,6 +943,7 @@ class NQueen1:
         plt.ylabel("Anzahl")
         plt.title("Anzahl der genutzten Crossover")
         plt.show();
+        plt.savefig('permutation_amount.png')
 
         return
 
@@ -966,6 +967,7 @@ class NQueen1:
         o_b, = ax.plot(x, y3, color='yellow', label ='order_based')
         ax.legend([p_m, p_b, o_b],["partielle_mapped", "position_based", "order_based"])
         plt.show()
+        plt.savefig('crossovers_per_epoche.png')
 
         return
 
@@ -999,6 +1001,7 @@ def show_overall_permutation_amount(array):
     plt.ylabel("Anzahl")
     plt.title("Anzahl der besten Crossover über alle Durchläufe")
     plt.show();
+    plt.savefig('overall_permutation_amount.png')
 
     return
 
