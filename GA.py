@@ -222,15 +222,15 @@ class NQueen1:
             worst = self.population[self.get_maximum()]
 
             thisChromo = self.population[i]
-            sys.stdout.write(str(thisChromo.get_conflicts()) + " Konflikte\n")
+            #sys.stdout.write(str(thisChromo.get_conflicts()) + " Konflikte\n")
             if genTotal != 0:
                 probability = ((worst.get_conflicts()-thisChromo.get_conflicts()) / genTotal)
             else:
                 probability = 0
-            sys.stdout.write("("+str(worst.get_conflicts()) + " - "+str(thisChromo.get_conflicts())+ ") / "+str(genTotal)+" =\n")
+            #sys.stdout.write("("+str(worst.get_conflicts()) + " - "+str(thisChromo.get_conflicts())+ ") / "+str(genTotal)+" =\n")
             sumProp += probability
             thisChromo.set_selection_probability(probability)
-            sys.stdout.write(str(probability) + " probability von chromosom\n")
+            #sys.stdout.write(str(probability) + " probability von chromosom\n")
 
         sys.stdout.write(str(sumProp) + " alle Props\n")
 
@@ -250,7 +250,7 @@ class NQueen1:
                     else:
                         thatChromo = self.population[j - 1]
 
-                    sys.stdout.write("im while eins selected\n")
+                    #sys.stdout.write("im while eins selected\n")
                     thatChromo.set_selected(True)
                     done = True
                 else:
@@ -271,7 +271,7 @@ class NQueen1:
                 #der anzahl an Nachwüchsen selected
                 if sumProp == 0:
                     self.population[i].set_selected(True)
-                    sys.stdout.write("im while i selected\n")
+                    #sys.stdout.write("im while i selected\n")
                     done = True
 
         return
@@ -279,12 +279,17 @@ class NQueen1:
     def choose_first_parent(self):
         parent = 0
         done = False
+        counter = 0
 
-        while not done:
+        while not done and counter < 100:
+            #print("sucht ersten Parent")
             # Randomly choose an eligible parent.
+            counter += 1
+            print(counter)
             parent = random.randrange(0, len(self.population) - 1)
             thisChromo = self.population[parent]
             if thisChromo.get_selected() == True:
+                print("erster Parent gefunden")
                 done = True
 
         return parent
@@ -301,7 +306,7 @@ class NQueen1:
             for i in range (len(self.population)):
                 if self.population[i].get_selected() == True:
                     probe_counter += 1
-                    sys.stdout.write(str(probe_counter) + ".Chromosom ist Selected.\n")
+                    #sys.stdout.write(str(probe_counter) +" "+ str(self.population[i].toStr())+ ".Chromosom ist Selected.\n")
 
             # Randomly choose an eligible parent.
             parentB = random.randrange(0, len(self.population) - 1)
@@ -313,7 +318,7 @@ class NQueen1:
                     done = True
             #im Falle, dass nur ein Chromosom selected wurde (im Falle von alle Konflikte sind 0), wird ein zufälliges
             #Chromosom als zweiten Parent gewählt
-                elif probe_counter < 2:
+                elif probe_counter <= 2:
                     sys.stdout.write("2. parent gefunden durch Schleifenaufhängung\n")
                     done = True
 
@@ -369,13 +374,13 @@ class NQueen1:
             sys.stdout.write(str(child1)+" kind1 wurde rausgehauen, Länge population: "+str(len(self.population))+"\n")
             child2 = child2-1
 
-        sys.stdout.write(str(crossPoints) + " CrossPoints\n")
-        sys.stdout.write("Parent1 mit Konflikten " + str(thisChromo.get_conflicts()))
-        thisChromo.toStr()
-        sys.stdout.write("Parent2 mit Konflikten " + str(thatChromo.get_conflicts()))
-        thatChromo.toStr()
-        sys.stdout.write("Kind1 Konflikten " + str(newChromo1.get_conflicts()))
-        newChromo1.toStr()
+       # sys.stdout.write(str(crossPoints) + " CrossPoints\n")
+        #sys.stdout.write("Parent1 mit Konflikten " + str(thisChromo.get_conflicts()))
+       #thisChromo.toStr()
+        #sys.stdout.write("Parent2 mit Konflikten " + str(thatChromo.get_conflicts()))
+        #thatChromo.toStr()
+       # sys.stdout.write("Kind1 Konflikten " + str(newChromo1.get_conflicts()))
+       # newChromo1.toStr()
 #
         # Get non-chosens from parent 1
         k = 0
@@ -613,19 +618,19 @@ class NQueen1:
                 newChromo2.set_data(i, thisChromo.get_data(i))
 
 
-        sys.stdout.write(str(points) + " Positionen der ausgewähten Zahlen\n")
-        sys.stdout.write(str(crossNumbers) + " CrossNumbers: Zahlen im 1. Parent\n")
-        sys.stdout.write(str(crossNumbers2) + " CrossNumbers2: Zahlen im 2. Parent\n")
-        sys.stdout.write(str(cpoints) + " cpoints im 2.Parent\n")
-        sys.stdout.write(str(cpoints2) + " cpoints im 1.Parent\n")
-        sys.stdout.write("Parent1")
-        thisChromo.toStr()
-        sys.stdout.write("Parent2")
-        thatChromo.toStr()
-        sys.stdout.write("Kind1  ")
-        newChromo1.toStr()
-        sys.stdout.write("Kind2  ")
-        newChromo2.toStr()
+        #sys.stdout.write(str(points) + " Positionen der ausgewähten Zahlen\n")
+        #sys.stdout.write(str(crossNumbers) + " CrossNumbers: Zahlen im 1. Parent\n")
+        #sys.stdout.write(str(crossNumbers2) + " CrossNumbers2: Zahlen im 2. Parent\n")
+        #sys.stdout.write(str(cpoints) + " cpoints im 2.Parent\n")
+        #sys.stdout.write(str(cpoints2) + " cpoints im 1.Parent\n")
+        #sys.stdout.write("Parent1")
+        #hisChromo.toStr()
+        #sys.stdout.write("Parent2")
+        #thatChromo.toStr()
+        #sys.stdout.write("Kind1  ")
+        #newChromo1.toStr()
+        #sys.stdout.write("Kind2  ")
+        #newChromo2.toStr()
         sys.stdout.write("Order-based Crossover verwendet.\n")
 
         return
@@ -942,8 +947,8 @@ class NQueen1:
         plt.bar(permutations, data, color=colors)
         plt.ylabel("Anzahl")
         plt.title("Anzahl der genutzten Crossover")
-        #plt.show();
-        plt.savefig('permutation_amount.png')
+        plt.show();
+        #plt.savefig('permutation_amount.png')
 
         return
 
@@ -966,8 +971,8 @@ class NQueen1:
         p_b, = ax.plot(x, y2, color='blue', label ='position_based')
         o_b, = ax.plot(x, y3, color='yellow', label ='order_based')
         ax.legend([p_m, p_b, o_b],["partielle_mapped", "position_based", "order_based"])
-        #plt.show()
-        plt.savefig('crossovers_per_epoche.png')
+        plt.show()
+        #plt.savefig('crossovers_per_epoche.png')
 
         return
 
@@ -1000,8 +1005,8 @@ def show_overall_permutation_amount(array):
     plt.bar(permutations, array, color=colors)
     plt.ylabel("Anzahl")
     plt.title("Anzahl der besten Crossover über alle Durchläufe")
-    #plt.show();
-    plt.savefig('overall_permutation_amount.png')
+    plt.show()
+    #plt.savefig('overall_permutation_amount.png')
 
     return
 
@@ -1010,7 +1015,7 @@ def show_overall_permutation_amount(array):
 if __name__ == '__main__':
     array = [0, 0, 0]
     counter = 0
-    while(counter != 10):
+    while(counter != 5):
         sys.stdout.write("COUNTER: " + str(counter)+"\n")
         nq1 = NQueen1(START_SIZE, MAX_EPOCHS, MATING_PROBABILITY, MUTATION_RATE, MIN_SELECT, MAX_SELECT,
                       OFFSPRING_PER_GENERATION, MINIMUM_SHUFFLES, MAXIMUM_SHUFFLES, PBC_MAX, MAX_LENGTH)
@@ -1018,8 +1023,8 @@ if __name__ == '__main__':
         nq1.initialize_chromosomes()
         nq1.genetic_algorithm()
         #zeige pro Druchlauf permutation-Anzahl und permutationen pro Epoche
-        nq1.show_permutation_amount()
-        nq1.show_crossover_per_epoche()
+        #nq1.show_permutation_amount()
+        #nq1.show_crossover_per_epoche()
 
         array = np.array(array) + nq1.get_best_crossover()
         counter += 1
