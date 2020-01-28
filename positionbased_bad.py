@@ -350,7 +350,6 @@ class NQueen1:
                 #Konflikte auf 30 gesetzt, damit Kind in jedem fall schlechter ist
                 conflicts_child1 = 30
             try:
-                newChromo2.compute_conflicts()
                 newChromo2 = self.population[newIndex2]
                 sys.stdout.write("mating: Kind2 mit Konflikte " + str(newChromo2.get_conflicts()))
                 newChromo2.toStr()
