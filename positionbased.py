@@ -372,6 +372,7 @@ class NQueen1:
             popSize = len(self.population)
             for i in range(popSize):
                 thisChromo = self.population[i]
+
                 if thisChromo.get_conflicts() == 0 or self.epoch == self.mEpochs:
                     done = True
 

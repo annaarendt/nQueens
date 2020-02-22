@@ -1,4 +1,8 @@
 
+
+from deap import benchmarks
+
+
 class Chromosome:
     #crossover-type 0,1 oder 2 (partitielle_mapped, position_based und order_based)
     def __init__(self, maxLength, crossover_type):
@@ -8,6 +12,7 @@ class Chromosome:
         self.mSelectionProbability = 0.0
         self.mConflicts = 0
         self.mCrossover = crossover_type
+        self.sFitness=0
 
         self.mData = [0] * maxLength
         for i in range(self.mMaxLength):
@@ -51,6 +56,10 @@ class Chromosome:
         self.mConflicts = conflicts
         return
 
+    def compute_fitness_schwefel(self):
+        self.sFitness=benchmarks.schwefel(self.toArray())
+        return
+
     def get_conflicts(self):
         return self.mConflicts
 
@@ -75,6 +84,14 @@ class Chromosome:
     def get_fitness(self):
         return self.mFitness
 
+    def set_sFitness(self, score):
+        self.sFitness = score
+        return
+
+    def get_sFitness(self):
+        return self.sFitness
+
+
     def set_crossover(self, type):
         self.mCrossover = type
         return
@@ -97,4 +114,13 @@ class Chromosome:
 
         print(str(array))
         return str(array)
+
+# Gene des Chromosoms als Liste darstellen
+    def toArray(self):
+        array = [0]*self.mMaxLength
+        for i in range(self.mMaxLength):
+            array[i] = self.get_data(i)
+
+        print(array)
+        return array
 

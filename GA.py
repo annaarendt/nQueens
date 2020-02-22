@@ -9,8 +9,6 @@ START_SIZE = 75  # Population size at start.
 MAX_EPOCHS = 40  # Arbitrary number of test cycles. Default 1000!
 MATING_PROBABILITY = 0.7  # Probability of two chromosomes mating. Range: 0.0 < MATING_PROBABILITY < 1.0
 MUTATION_RATE = 0.001  # Mutation Rate. Range: 0.0 < MUTATION_RATE < 1.0
-MIN_SELECT = 10  # Minimum parents allowed for selection.
-MAX_SELECT = 50  # Maximum parents allowed for selection. Range: MIN_SELECT < MAX_SELECT < START_SIZE
 #pro mating aber 2 Kinder -> offspring_per_epoche=1 erstellt 2 Kinder von 2 Eltern. wert auf 20 entspricht 40 kinder von
 #40 (nicht unbedignt unterschiedlichn) eltern
 OFFSPRING_PER_GENERATION = 20  # New offspring created per generation. Range: 0 < OFFSPRING_PER_GENERATION < MAX_SELECT.
@@ -22,22 +20,19 @@ MAX_LENGTH = 10 # chess board width.
 
 
 #welcher crossover für welche phase besser
-#mutaion von corssover und crossover fixen, auf viele durchgänge testen
-#eine schlechte rekombinationsmethode implementieren zum testen
+#mutation von corssover und crossover fixen, auf viele durchgänge testen
 
 #eltern nicht ganzwegschmeiße. kinder erezugen random , zsm schmeisen und dann die besten kinder weiternehmen.
 #vlt. nur ein kind? crossover dass das beste weitergegeben werden
 
 
 class NQueen1:
-    def __init__(self, startSize, maxEpochs, matingProb, mutationRate, minSelect, maxSelect, generation, minShuffles,
+    def __init__(self, startSize, maxEpochs, matingProb, mutationRate, generation, minShuffles,
                  maxShuffles, pbcMax, maxLength):
         self.mStartSize = startSize
         self.mEpochs = maxEpochs
         self.mMatingProbability = matingProb
         self.mMutationRate = mutationRate
-        self.mMinSelect = minSelect
-        self.mMaxSelect = maxSelect
         self.mOffspringPerGeneration = generation
         self.mMinimumShuffles = minShuffles
         self.mMaximumShuffles = maxShuffles
@@ -203,6 +198,22 @@ class NQueen1:
 
         return
 
+    #SCHWEFELFUNKTION, fitness der schwefelfunktion ist das jeweilige Z -> je niedriger desto besser
+    def get_sFitness(self):
+        popSize = len(self.population)
+        sys.stdout.write(str(len(self.population)) + " Länge der Population\n")
+
+        for i in range(popSize):
+            thisChromo = self.population[i]
+            worst = self.population[self.get_maximum()]
+            sys.stdout.write(str(thisChromo.get_sFitness())
+                             + ", ")
+        sys.stdout.write("\n"+str(thisChromo.get_sFitness()) + " Fitness CHROMO\n")
+        sys.stdout.write("\n"+str(worst.get_sFitness()) + " Fitness\n")
+
+
+        return
+
     #Selektion der Eltern mit Roulette-Methode. Je besser (kleiner) Fitness, desto mehr Anteil auf dem Roulette
     def roulette_selection(self):
         genTotal = 0.0
@@ -299,7 +310,7 @@ class NQueen1:
         done = False
 
         while not done:
-            print("in choose second parent angekommen")
+            #print("in choose second parent angekommen")
             #test um zu sehen wieviele Chromosomen in eine rPopulation seleced wurden (wenn nur einer, dann Grund warum
             #sich schleife aufhängt
             probe_counter = 0
@@ -530,13 +541,13 @@ class NQueen1:
             if matchFound == False:
                 newChromo1.set_data(i, tempArray1[k])
                 k += 1
-        sys.stdout.write(str(crossPoints) + " CrossPoints\n")
-        sys.stdout.write("Parent1")
-        thisChromo.toStr()
-        sys.stdout.write("Parent2")
-        thatChromo.toStr()
-        sys.stdout.write("Kind1  ")
-        newChromo1.toStr()
+        #sys.stdout.write(str(crossPoints) + " CrossPoints\n")
+        #sys.stdout.write("Parent1")
+        #thisChromo.toStr()
+        #sys.stdout.write("Parent2")
+        #thatChromo.toStr()
+        #sys.stdout.write("Kind1  ")
+        #newChromo1.toStr()
         # Get non-chosens from parent 1
         k = 0
         for i in range(self.mMaxLength):
@@ -813,7 +824,7 @@ class NQueen1:
                 try:
                     newChromo1.compute_conflicts()
                     newChromo1 = self.population[newIndex1]
-                    sys.stdout.write("Kind1 mit Konflikte " + str(newChromo1.get_conflicts()))
+                    #sys.stdout.write("Kind1 mit Konflikte " + str(newChromo1.get_conflicts()))
                     newChromo1.toStr()
                     self.childCount += 1
                 except IndexError:
@@ -821,16 +832,16 @@ class NQueen1:
                 try:
                     newChromo2.compute_conflicts()
                     newChromo2 = self.population[newIndex2]
-                    sys.stdout.write("Kind2 mit Konflikte " + str(newChromo2.get_conflicts()))
+                    #sys.stdout.write("Kind2 mit Konflikte " + str(newChromo2.get_conflicts()))
                     newChromo2.toStr()
                     self.childCount += 1
                 except IndexError:
                     print("INDEXERROR, newIndex1 gibt es nicht")
 
-                sys.stdout.write("Parent1 mit Konflikte " + str(chromA.get_conflicts()))
-                chromA.toStr()
-                sys.stdout.write("Parent2 mit Konflikte " + str(chromB.get_conflicts()))
-                chromB.toStr()
+                #sys.stdout.write("Parent1 mit Konflikte " + str(chromA.get_conflicts()))
+                #chromA.toStr()
+                #sys.stdout.write("Parent2 mit Konflikte " + str(chromB.get_conflicts()))
+                #chromB.toStr()
 
                 # Schedule next mutation.
                 if math.fmod(self.childCount, self.math_round(1.0 / self.mMutationRate)) == 0:
@@ -947,8 +958,8 @@ class NQueen1:
         plt.bar(permutations, data, color=colors)
         plt.ylabel("Anzahl")
         plt.title("Anzahl der genutzten Crossover")
-        plt.show();
-        #plt.savefig('permutation_amount.png')
+        #plt.show();
+        plt.savefig('permutation_amount.png')
 
         return
 
@@ -1015,10 +1026,11 @@ def show_overall_permutation_amount(array):
 if __name__ == '__main__':
     array = [0, 0, 0]
     counter = 0
-    while(counter != 5):
+    while(counter != 100):
+        print("_________________________________________________________________")
         sys.stdout.write("COUNTER: " + str(counter)+"\n")
-        nq1 = NQueen1(START_SIZE, MAX_EPOCHS, MATING_PROBABILITY, MUTATION_RATE, MIN_SELECT, MAX_SELECT,
-                      OFFSPRING_PER_GENERATION, MINIMUM_SHUFFLES, MAXIMUM_SHUFFLES, PBC_MAX, MAX_LENGTH)
+        nq1 = NQueen1(START_SIZE, MAX_EPOCHS, MATING_PROBABILITY, MUTATION_RATE, OFFSPRING_PER_GENERATION,
+                      MINIMUM_SHUFFLES, MAXIMUM_SHUFFLES, PBC_MAX, MAX_LENGTH)
 
         nq1.initialize_chromosomes()
         nq1.genetic_algorithm()

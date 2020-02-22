@@ -5,6 +5,23 @@ import matplotlib.pyplot as plt
 import numpy as np
 from Chromosome import Chromosome
 
+#wie schnell fallen sie runter
+#alle rekombinationen nehmen, der ea macht das schon selber, rechenzeit wird nur am anfang verschwendet
+#phänomen herauarbeiten, dass es nicht direkt weitergegeben wird, dass sich die tendenz zeigt, auch wenn man davor nicht
+#sagt welcher algorithmus genommen werden soll
+#benchmark schlechter algorithmus
+#was ist das, warum mache ich das, wie ist er aufgebaut
+#interpretation zu den grafiken immer geben, achsenbeschriftung
+#wie kann man noch weiter experimentieren
+#GA für nächste work, zukunft, ausblick, motivation (unterschied EA und GA)
+#mit untersch. brettgrößen testen
+#2 oder 3. domaine -> Travelman, rucksack thomas: schickt mir seine problemdomainen.
+#wie ist das verhätltnis in der letzten population, das interpretieren, spannend wenn sie reihenfolge einhalten
+#kann man vorhersagen, welche rekombination wie oft genutzt wird
+#overhead analysen vergleich mit nur besten, ist das dann beser? und wenn ja wie viel schneller.. ist es wirklcih besser
+#alle reinzuschmeißen
+
+
 START_SIZE = 2  # Population size at start.
 MAX_EPOCHS = 0  # Arbitrary number of test cycles. EIGENTLICH AUF 1000 GESETZT!
 OFFSPRING_PER_GENERATION = 1  # New offspring created per generation. Range: 0 < OFFSPRING_PER_GENERATION < MAX_SELECT.
