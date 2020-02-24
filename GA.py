@@ -4,6 +4,7 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 from Chromosome import Chromosome
+from Overall_plots import OverallPlots
 
 START_SIZE = 75  # Population size at start.
 MAX_EPOCHS = 40  # Arbitrary number of test cycles. Default 1000!
@@ -159,6 +160,7 @@ class NQueen1:
             i += 1
 
         self.mutations += 1
+
         return
 
     def initialize_chromosomes(self):
@@ -347,7 +349,7 @@ class NQueen1:
         numPoints = random.randrange(0, self.mPBCMax)  # if PBC_MAX is set any higher than 6 or 8.
         crossPoints = [0] * numPoints
         for i in range(numPoints):
-            crossPoints[i] = self.get_exclusive_random_integer_by_array(0, self.mMaxLength - 1, crossPoints)
+            crossPoints[i] = NQueen1.get_exclusive_random_integer_by_array(self, 0, self.mMaxLength - 1, crossPoints)
         # Get non-chosens from parent 2: Die Zahlen die bei P2 nicht an den ausgewählten Stellen bei P1 stehen werden in
         # einem Array gesammelt (tempArray1)
         k = 0
@@ -443,7 +445,7 @@ class NQueen1:
         newChromo2 = self.population[child2]
 
         crossPoint1 = random.randrange(0, self.mMaxLength)
-        crossPoint2 = self.get_exclusive_random_integer(self.mMaxLength, crossPoint1)
+        crossPoint2 = NQueen1.get_exclusive_random_integer(self, self.mMaxLength, crossPoint1)
         if crossPoint2 < crossPoint1:
             j = crossPoint1
             crossPoint1 = crossPoint2
@@ -490,14 +492,14 @@ class NQueen1:
         sys.stdout.write("Parent1")
         thisChromo.toStr()
         sys.stdout.write("Parent2")
-        sys.stdout.write(" hat "+str(thatChromo.get_conflicts())+" Konflikte\n")
+        #sys.stdout.write(" hat "+str(thatChromo.get_conflicts())+" Konflikte\n")
         thatChromo.toStr()
-
+        """""
         sys.stdout.write("Partially-maped Crossover verwendet.\nMit crossovertyp: "+str(thisChromo.get_crossover())+
                          ", "+str(thatChromo.get_crossover())+"\nUnd konflikte "+str(thisChromo.get_conflicts())+
                          ", "+str(thatChromo.get_conflicts())+"\nUnd crossover der neuen: "
                          +str(newChromo1.get_crossover())+", " + str(newChromo2.get_crossover()) + "\n")
-
+"""
         return
 
     def position_based_crossover(self, chromA, chromB, child1, child2):
@@ -512,7 +514,7 @@ class NQueen1:
         numPoints = random.randrange(0, self.mPBCMax)  # if PBC_MAX is set any higher than 6 or 8.
         crossPoints = [0] * numPoints
         for i in range(numPoints):
-            crossPoints[i] = self.get_exclusive_random_integer_by_array(0, self.mMaxLength - 1, crossPoints)
+            crossPoints[i] = NQueen1.get_exclusive_random_integer_by_array(self, 0, self.mMaxLength - 1, crossPoints)
         # Get non-chosens from parent 2: Die Zahlen die bei P2 nicht an den ausgewählten Stellen bei P1 stehen werden in
         # einem Array gesammelt (tempArray1)
         k = 0
@@ -595,27 +597,27 @@ class NQueen1:
         numPoints = random.randrange(0, self.mPBCMax)  # if PBC_MAX is set any higher than 6 or 8.
         points = [0] * numPoints
         for i in range(numPoints):
-            points[i] = self.get_exclusive_random_integer_by_array(0, self.mMaxLength - 1, points)
+            points[i] = NQueen1.get_exclusive_random_integer_by_array(self, 0, self.mMaxLength - 1, points)
         points.sort()
 
-        crossNumbers = self.findCrossNumbers(numPoints, points, thisChromo)
-        crossNumbers2 = self.findCrossNumbers(numPoints, points, thatChromo)
+        crossNumbers = NQueen1.findCrossNumbers(self, numPoints, points, thisChromo)
+        crossNumbers2 = NQueen1.findCrossNumbers(self, numPoints, points, thatChromo)
 
 
         # von Parent2 werden Positionen der Zahlen von Parent1 (in crossNumbers) gesucht und in Array cpoints
         # gespeichert.
         # Von den Zahlen die bei P2  den ausgewählten Zahlen in crossNumbers entsprechen werden die Positionen in
         # einem Array gesammelt (points)
-        cpoints = self.findCPoints(numPoints, thatChromo, crossNumbers)
-        cpoints2 = self.findCPoints(numPoints, thisChromo, crossNumbers2)
+        cpoints = NQueen1.findCPoints(self, numPoints, thatChromo, crossNumbers)
+        cpoints2 = NQueen1.findCPoints(self, numPoints, thisChromo, crossNumbers2)
 
 
 
         #temporäres Array erzeugen mit Lücken in Positionen von cpoints/cpoint2, danach Lücken mit crossNumbers/
         # crossNumbers2 füllen
 
-        array1 = self.fullfill(numPoints, cpoints, thatChromo, crossNumbers)
-        array2 = self.fullfill(numPoints, cpoints2, thisChromo, crossNumbers2)
+        array1 = NQueen1.fullfill(self, numPoints, cpoints, thatChromo, crossNumbers)
+        array2 = NQueen1.fullfill(self, numPoints, cpoints2, thisChromo, crossNumbers2)
 
         for i in range(self.mMaxLength):
             newChromo1.set_data(i, array1[i])
@@ -629,19 +631,6 @@ class NQueen1:
                 newChromo2.set_data(i, thisChromo.get_data(i))
 
 
-        #sys.stdout.write(str(points) + " Positionen der ausgewähten Zahlen\n")
-        #sys.stdout.write(str(crossNumbers) + " CrossNumbers: Zahlen im 1. Parent\n")
-        #sys.stdout.write(str(crossNumbers2) + " CrossNumbers2: Zahlen im 2. Parent\n")
-        #sys.stdout.write(str(cpoints) + " cpoints im 2.Parent\n")
-        #sys.stdout.write(str(cpoints2) + " cpoints im 1.Parent\n")
-        #sys.stdout.write("Parent1")
-        #hisChromo.toStr()
-        #sys.stdout.write("Parent2")
-        #thatChromo.toStr()
-        #sys.stdout.write("Kind1  ")
-        #newChromo1.toStr()
-        #sys.stdout.write("Kind2  ")
-        #newChromo2.toStr()
         sys.stdout.write("Order-based Crossover verwendet.\n")
 
         return
@@ -1010,19 +999,6 @@ class NQueen1:
 
 
 
-def show_overall_permutation_amount(array):
-    permutations = ["partielle_mapped", "position_based", "order_based"]
-    colors = ['lightsalmon', 'darkblue', 'gold']
-    plt.bar(permutations, array, color=colors)
-    plt.ylabel("Anzahl")
-    plt.title("Anzahl der besten Crossover über alle Durchläufe")
-    plt.show()
-    #plt.savefig('overall_permutation_amount.png')
-
-    return
-
-
-
 if __name__ == '__main__':
     array = [0, 0, 0]
     counter = 0
@@ -1042,7 +1018,7 @@ if __name__ == '__main__':
         counter += 1
 
     print(array)
-    show_overall_permutation_amount(array)
+    OverallPlots.show_overall_permutation_amount(array)
 
 
 
