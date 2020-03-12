@@ -56,6 +56,10 @@ class NQueen1:
         self.current_p_m = 0
         self.current_p_b = 0
         self.current_o_b = 0
+
+        #variablen für fitness-epochen-plot
+        self.current_best_fitness = 0
+        self.array_fitness = [0]
         return
 
     #gibt zufällige Zahl zurück mit obergrenze(high) -> untere Grenze ist 0, darf aber nicht Wert von numberA haben.
@@ -107,7 +111,7 @@ class NQueen1:
                     thisChromo = self.population[i]
                     thatChromo = self.population[maximum]
                     # The maximum has to be in relation to the Target.
-                    if math.fabs(thisChromo.get_conflicts() > thatChromo.get_conflicts()):
+                    if math.fabs(thisChromo.get_fitness() > thatChromo.get_fitness()):
                         maximum = i
                         foundNewMaximum = True
 
@@ -129,7 +133,7 @@ class NQueen1:
                     thisChromo = self.population[i]
                     thatChromo = self.population[minimum]
                     # The minimum has to be in relation to the Target.
-                    if math.fabs(thisChromo.get_conflicts() < thatChromo.get_conflicts()):
+                    if math.fabs(thisChromo.get_fitness() < thatChromo.get_fitness()):
                         minimum = i
                         foundNewMinimum = True
 
@@ -174,11 +178,10 @@ class NQueen1:
 
             # Randomly choose the number of shuffles to perform.
             shuffles = random.randrange(self.mMinimumShuffles, self.mMaximumShuffles)
-
-            self.exchange_mutation(chromoIndex, shuffles)
+            NQueen1.exchange_mutation(self, chromoIndex, shuffles)
 
             newChromo = self.population[chromoIndex]
-            newChromo.compute_conflicts()
+            newChromo.compute_fitness()
 
         return
 
@@ -187,15 +190,19 @@ class NQueen1:
     def get_fitness(self):
         #fitness entspricht den Konflikten. Niedrige Fitness ist gut, hohe ist schlecht
         popSize = len(self.population)
-        sys.stdout.write(str(len(self.population)) + " Länge der Population..Konflikte:\n")
+        sys.stdout.write(str(len(self.population)) + " Länge der Population..Fitness:\n")
 
         for i in range(popSize):
             thisChromo = self.population[i]
             worst = self.population[self.get_maximum()]
-            sys.stdout.write(str(thisChromo.get_conflicts())
+            best = self.population[self.get_minimum()]
+            sys.stdout.write(str(Chromosome.get_fitness(thisChromo))
                              + ", ")
 
-        sys.stdout.write("\n"+str(worst.get_conflicts()) + " Maximale Konflikte\n")
+        sys.stdout.write("\n"+str(Chromosome.get_fitness(worst)) + ": Maximale Fitness\n")
+        sys.stdout.write(str(Chromosome.get_fitness(best)) + ": Minimale Fitness\n")
+        self.current_best_fitness = Chromosome.get_fitness(best)
+        self.array_fitness.append(self.current_best_fitness)
 
 
         return
@@ -210,7 +217,7 @@ class NQueen1:
             worst = self.population[self.get_maximum()]
             thisChromo = self.population[i]
             #zählt quasi die Fitness aller Chromosomen zusammen (abgezogen von Indivuduum mit höchstem Konfliktwert)
-            genTotal += (worst.get_conflicts()-thisChromo.get_conflicts())
+            genTotal += (Chromosome.get_fitness(worst) - Chromosome.get_fitness(thisChromo))
 
         sys.stdout.write(str(genTotal) + " GenTotal(Roulette)\n")
         sys.stdout.write(str(popSize) + " popSize\n")
@@ -221,15 +228,15 @@ class NQueen1:
             thisChromo = self.population[i]
             #sys.stdout.write(str(thisChromo.get_conflicts()) + " Konflikte\n")
             if genTotal != 0:
-                probability = ((worst.get_conflicts()-thisChromo.get_conflicts()) / genTotal)
+                probability = ((Chromosome.get_fitness(worst) - Chromosome.get_fitness(thisChromo)) / genTotal)
             else:
                 probability = 0
             #sys.stdout.write("("+str(worst.get_conflicts()) + " - "+str(thisChromo.get_conflicts())+ ") / "+str(genTotal)+" =\n")
             sumProp += probability
-            thisChromo.set_selection_probability(probability)
+            Chromosome.set_selection_probability(thisChromo, probability)
             #sys.stdout.write(str(probability) + " probability von chromosom\n")
 
-        sys.stdout.write(str(sumProp) + " alle Props\n")
+        sys.stdout.write(str(round(sumProp, 3)) + " alle Props\n")
 
         for i in range(self.mOffspringPerGeneration):
             rouletteSpin = random.uniform(0, 1)
@@ -238,7 +245,7 @@ class NQueen1:
             done = False
             while not done:
                 thisChromo = self.population[j]
-                selTotal += thisChromo.get_selection_probability()
+                selTotal += Chromosome.get_selection_probability(thisChromo)
                 if selTotal >= rouletteSpin:
                     if j == 0:
                         thatChromo = self.population[j]
@@ -248,22 +255,11 @@ class NQueen1:
                         thatChromo = self.population[j - 1]
 
                     #sys.stdout.write("im while eins selected\n")
-                    Chromosome.set_selected(thatChromo,True)
+                    Chromosome.set_selected(thatChromo, True)
                     done = True
                 else:
                     j += 1
 
-                """""
-                #wenn j startsize ist , wird das letzte Individuum als Elternteil genommen und das davor
-                #TODO Fehlerquelle: wenn nicht bei allen nahckommensdurchläufen 75 erreicht wird, werden zuviele
-                #TODO seletiert und das ziemlich random
-                if j>=START_SIZE:
-                    thatChromo = self.population[j-1]
-                    thatChromo2 = self.population[j-2]
-                    thatChromo.set_selected(True)
-                    thatChromo2.set_selected(True)
-                    done = True
-                    """""
                 #wenn nur noch Individuen mit 0 Konflikten vorhanden sind, immer die Chromosomen mit jeweiliger zahl
                 #der anzahl an Nachwüchsen selected
                 if sumProp == 0:
@@ -282,11 +278,11 @@ class NQueen1:
             #print("sucht ersten Parent")
             # Randomly choose an eligible parent.
             counter += 1
-            print(counter)
+            #print(counter)
             parent = random.randrange(0, len(self.population) - 1)
             thisChromo = self.population[parent]
             if Chromosome.get_selected(thisChromo) == True:
-                print("erster Parent gefunden")
+                print("1. Parent gefunden")
                 done = True
 
         return parent
@@ -309,7 +305,7 @@ class NQueen1:
             parentB = random.randrange(0, len(self.population) - 1)
             if parentB != parentA:
                 thisChromo = self.population[parentB]
-                sys.stdout.write(str(Chromosome.get_selected(thisChromo))+"\n")
+                #sys.stdout.write(str(Chromosome.get_selected(thisChromo))+"\n")
                 if Chromosome.get_selected(thisChromo) == True:
                     sys.stdout.write("2. parent gefunden\n")
                     done = True
@@ -362,12 +358,12 @@ class NQueen1:
             if matchFound == False:
                 newChromo1.set_data(i, tempArray1[k])
                 k += 1
-        newChromo1.compute_conflicts()
+        newChromo1.compute_fitness()
 
         #Kind1 wird rausgehauen und index child2 um eins heragesetzt weil sich population auch wieder ändert
-        if newChromo1.get_conflicts() < thisChromo.get_conflicts() or newChromo1.get_conflicts() < thatChromo.get_conflicts():
-            sys.stdout.write("Kind1 zu wenig Konflikte: "+str(newChromo2.get_conflicts())+"\n")
-            newChromo1.set_conflicts(18)
+        if newChromo1.get_fitness() < thisChromo.get_fitness() or newChromo1.get_fitness() < thatChromo.get_fitness():
+            sys.stdout.write("Kind1 zu wenig Konflikte: " + str(newChromo2.get_fitness()) + "\n")
+            newChromo1.set_fitness(18)
             sys.stdout.write("Kind1 wurde auf 18 Konlikte erhöht\n")
 #
         # Get non-chosens from parent 1
@@ -398,11 +394,11 @@ class NQueen1:
                 newChromo2.set_data(i, tempArray2[k])
                 k += 1
 
-        newChromo2.compute_conflicts()
+        newChromo2.compute_fitness()
 
-        if newChromo2.get_conflicts() < thisChromo.get_conflicts() or newChromo2.get_conflicts() < thatChromo.get_conflicts():
-            sys.stdout.write("Kind2 zu wenig Konflikte: "+str(newChromo2.get_conflicts())+"\n")
-            newChromo2.set_conflicts(18)
+        if newChromo2.get_fitness() < thisChromo.get_fitness() or newChromo2.get_fitness() < thatChromo.get_fitness():
+            sys.stdout.write("Kind2 zu wenig Konflikte: " + str(newChromo2.get_fitness()) + "\n")
+            newChromo2.set_fitness(18)
             sys.stdout.write("Kind2 wurde auf 18 Konlikte erhöht\n")
 
         sys.stdout.write(str(crossPoints) + " CrossPoints\n")
@@ -461,8 +457,8 @@ class NQueen1:
                 Chromosome.set_data(newChromo2,pos2, item2)
 
 
-            newChromo1.compute_conflicts()
-            newChromo2.compute_conflicts()
+            newChromo1.compute_fitness()
+            newChromo2.compute_fitness()
 
         sys.stdout.write(str(crossPoint1) + " CrossPoints, ")
         sys.stdout.write(str(crossPoint2) + " CrossPoints\n")
@@ -538,8 +534,8 @@ class NQueen1:
                 Chromosome.set_data(newChromo2, i, tempArray2[k])
                 k += 1
 
-        newChromo1.compute_conflicts()
-        newChromo2.compute_conflicts()
+        newChromo1.compute_fitness()
+        newChromo2.compute_fitness()
 
         sys.stdout.write("Position-based Crossover verwendet.\n")
         return
@@ -593,8 +589,8 @@ class NQueen1:
                 Chromosome.set_data(newChromo1,i, Chromosome.get_data(thatChromo,i))
                 Chromosome.set_data(newChromo2,i, Chromosome.get_data(thisChromo,i))
 
-        newChromo1.compute_conflicts()
-        newChromo2.compute_conflicts()
+        newChromo1.compute_fitness()
+        newChromo2.compute_fitness()
 
         sys.stdout.write("Order-based Crossover verwendet.\n")
 
@@ -712,20 +708,20 @@ class NQueen1:
     #wenn die eltern verschiedene crossover haben wird das übernommen von dem elternteil bessere fitness hat
     def do_mating(self):
         for i in range(self.mOffspringPerGeneration):
-            print("for schleife in mating")
+            #print("for schleife in mating")
             parentA = self.choose_first_parent()
             # Test probability of mating.
             getRand = random.randrange(0, 100)
 
             if getRand <= self.mMatingProbability * 100:
-                print ("im ersten if, mating")
+                #print ("im ersten if, mating")
                 parentB = self.choose_second_parent(parentA)
-                print("parents gefunden, mating")
+                #print("parents gefunden, mating")
                 #das crossover des Elternteils mit größerer Fitness wird gewählt
                 chromA = self.population[parentA]
                 chromB = self.population[parentB]
 
-                if chromA.get_conflicts() < chromB.get_conflicts():
+                if chromA.get_fitness() < chromB.get_fitness():
                     type = chromA.get_crossover()
                 else:
                     type = chromB.get_crossover()
@@ -777,14 +773,14 @@ class NQueen1:
                 newChromo1 = self.population[newIndex1]
                 # Konsole:
                 sys.stdout.write("Kind1 mit ")
-                sys.stdout.write(str(newChromo1.get_conflicts()) + " Konflikten: ")
+                sys.stdout.write(str(newChromo1.get_fitness()) + " Konflikten: ")
                 newChromo1.toStr() + "\n"
                 self.childCount += 1
 
                 newChromo2 = self.population[newIndex2]
                 # Konsole:
                 sys.stdout.write("Kind2 mit ")
-                sys.stdout.write(str(newChromo2.get_conflicts()) + " Konflikten: ")
+                sys.stdout.write(str(newChromo2.get_fitness()) + " Konflikten: ")
                 newChromo2.toStr() + "\n"
                 self.childCount += 1
 
@@ -846,7 +842,7 @@ class NQueen1:
             popSize = len(self.population)
             for i in range(popSize):
                 thisChromo = self.population[i]
-                if thisChromo.get_conflicts() == 0 or self.epoch == self.mEpochs:
+                if thisChromo.get_fitness() == 0 or self.epoch == self.mEpochs:
                     done = True
 
             self.get_fitness()
@@ -880,8 +876,8 @@ class NQueen1:
             popSize = len(self.population)
             for i in range(popSize):
                 thisChromo = self.population[i]
-                if thisChromo.get_conflicts() == 0:
-                    sys.stdout.write(str(thisChromo.toStr())+" hat " + str(thisChromo.get_conflicts()) + " Konflikte.\n")
+                if thisChromo.get_fitness() == 0:
+                    sys.stdout.write(str(thisChromo.toStr()) +" hat " + str(thisChromo.get_fitness()) + " Konflikte.\n")
                     self.print_best_solution(thisChromo)
                     break
 
