@@ -1,4 +1,3 @@
-import random
 import sys
 import matplotlib.pyplot as plt
 from Chromosome import Chromosome
@@ -48,32 +47,33 @@ class SingleRekomb:
             newIndex2 = len(self.population) - 1
 
             sys.stdout.write("Parent1 mit ")
-            sys.stdout.write(str(chromA.get_conflicts()) + " Konflikten: ")
+            sys.stdout.write(str(chromA.get_fitness()) + " Konflikten: ")
             chromA.toStr() + "\n"
             sys.stdout.write("Parent2 mit ")
-            sys.stdout.write(str(chromB.get_conflicts()) + " Konflikten: ")
+            sys.stdout.write(str(chromB.get_fitness()) + " Konflikten: ")
             chromB.toStr() + "\n"
 
             #TODO diese Zeile ändern, je nach gewünschter Rekombination (bad funktioniert nur als self.bad...)
-            NQueen1.bad_recombination(self, chromA, chromB, newIndex1, newIndex2)
+            NQueen1.position_based_crossover(self, chromA, chromB, newIndex1, newIndex2)
 
             newChromo1 = self.population[newIndex1]
             # Konsole:
             sys.stdout.write("Kind1 mit ")
-            sys.stdout.write(str(newChromo1.get_conflicts()) + " Konflikten: ")
+            sys.stdout.write(str(newChromo1.get_fitness()) + " Konflikten: ")
             newChromo1.toStr()+"\n"
 
             newChromo2 = self.population[newIndex2]
             # Konsole:
             sys.stdout.write("Kind2 mit ")
-            sys.stdout.write(str(newChromo2.get_conflicts()) + " Konflikten: ")
+            sys.stdout.write(str(newChromo2.get_fitness()) + " Konflikten: ")
             newChromo2.toStr()+"\n"
 
             self.childCount += 2
             sys.stdout.write(str(len(self.population)) + " Länge der Population\n")
 
-            self.set_conflict_array(chromA.get_conflicts(), chromB.get_conflicts(),
-             newChromo1.get_conflicts(), newChromo2.get_conflicts())
+            self.set_conflict_array(chromA.get_fitness(), chromB.get_fitness(),
+                                    newChromo1.get_fitness(), newChromo2.get_fitness())
+
             # plot für jeden einzelnen Druchgang
             #self.show_conflicts(chromA, chromB, newChromo1, newChromo2)
 
@@ -121,8 +121,8 @@ class SingleRekomb:
     #Konflikte der Eltern und Kinder werden in einem Plot gezeigt
     def show_conflicts(self, chromP1, chromP2, chromK1, chromK2 ):
         chromosomes=["P1", "P2", "K1", "K2"]
-        conflicts=[chromP1.get_conflicts(), chromP2.get_conflicts(),chromK1.get_conflicts(),
-                            chromK2.get_conflicts()]
+        conflicts=[chromP1.get_fitness(), chromP2.get_fitness(), chromK1.get_fitness(),
+                   chromK2.get_fitness()]
 
         plt.scatter(chromosomes, conflicts, c='b', marker='o')
         plt.xlabel('Chromosomen', fontsize=16)
