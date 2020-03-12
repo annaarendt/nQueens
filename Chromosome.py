@@ -10,16 +10,14 @@ class Chromosome:
         self.mFitness = 0.0
         self.mSelected = False
         self.mSelectionProbability = 0.0
-        self.mConflicts = 0
         self.mCrossover = crossover_type
-        self.sFitness=0
 
         self.mData = [0] * maxLength
         for i in range(self.mMaxLength):
             self.mData[i] = i
         return
 
-    def compute_conflicts(self):
+    def compute_fitness(self):
         x = 0
         y = 0
         tempx = 0
@@ -53,15 +51,14 @@ class Chromosome:
                         if board[tempx][tempy] == "Q":
                             conflicts += 1
 
-        self.mConflicts = conflicts
+        self.mFitness = conflicts
         return
 
-    def compute_fitness_schwefel(self):
-        self.sFitness=benchmarks.schwefel(self.toArray())
-        return
+    def get_fitness(self):
+        return self.mFitness
 
-    def get_conflicts(self):
-        return self.mConflicts
+    def set_fitness(self, fitness):
+        self.mFitness = fitness
 
     def set_selection_probability(self, probability):
         self.mSelectionProbability = probability
@@ -76,21 +73,6 @@ class Chromosome:
 
     def get_selected(self):
         return self.mSelected
-
-    def set_fitness(self, score):
-        self.mFitness = score
-        return
-
-    def get_fitness(self):
-        return self.mFitness
-
-    def set_sFitness(self, score):
-        self.sFitness = score
-        return
-
-    def get_sFitness(self):
-        return self.sFitness
-
 
     def set_crossover(self, type):
         self.mCrossover = type
@@ -110,17 +92,17 @@ class Chromosome:
     def toStr(self):
         array = [0]*self.mMaxLength
         for i in range(self.mMaxLength):
-            array[i] = self.get_data(i)
+            array[i] = Chromosome.get_data(self,i)
 
         print(str(array))
         return str(array)
 
-# Gene des Chromosoms als Liste darstellen
-    def toArray(self):
-        array = [0]*self.mMaxLength
-        for i in range(self.mMaxLength):
-            array[i] = self.get_data(i)
+        # Gene des Chromosoms als Liste darstellen
 
-        print(array)
+    def toArray(self):
+        array = [0] * self.mMaxLength
+        for i in range(self.mMaxLength):
+            array[i] = Chromosome.get_data(self,i)
+
         return array
 
