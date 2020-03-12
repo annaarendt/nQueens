@@ -899,8 +899,8 @@ class NQueen1:
         plt.bar(permutations, data, color=colors)
         plt.ylabel("Anzahl")
         plt.title("Anzahl der genutzten Crossover")
-        #plt.show();
-        plt.savefig('permutation_amount.png')
+        plt.show();
+        #plt.savefig('permutation_amount.png')
 
         return
 
