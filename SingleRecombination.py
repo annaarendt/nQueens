@@ -30,52 +30,9 @@ class SingleRekomb:
         self.population = []
         #1. und 2. stelle für Konflikte der Eltern, letzen beiden der Kinder
         self.conflict_array = [0] * 4
+        self.mutations = 0
 
         return
-
-
-    # Mutation, die einfach nur 2 Gene des Chromosoms austauscht
-    def exchange_mutation(self, index, exchanges):
-        i = 0
-        done = False
-
-        thisChromo = self.population[index]
-
-        while not done:
-            gene1 = random.randrange(0, self.mMaxLength)
-            gene2 = NQueen1.get_exclusive_random_integer(self, self.mMaxLength, gene1)
-
-            # Exchange the chosen genes.
-            tempData = thisChromo.get_data(gene1)
-            thisChromo.set_data(gene1, thisChromo.get_data(gene2))
-            thisChromo.set_data(gene2, tempData)
-
-            if i == exchanges:
-                done = True
-
-            i += 1
-        return
-
-    def initialize_chromosomes(self):
-        for i in range(self.mStartSize):
-            newChromo = Chromosome(self.mMaxLength, 0)
-            self.population.append(newChromo)
-            chromoIndex = len(self.population) - 1
-
-            # Randomly choose the number of shuffles to perform.
-            shuffles = random.randrange(self.mMinimumShuffles, self.mMaximumShuffles)
-
-            self.exchange_mutation(chromoIndex, shuffles)
-
-            newChromo = self.population[chromoIndex]
-            newChromo.compute_conflicts()
-
-            # Konsole:
-            sys.stdout.write("erstelltes Chromosom (Parent) mit ")
-            sys.stdout.write(str(newChromo.get_conflicts()) + " Konflikten: ")
-            newChromo.toStr()+"\n"
-        return
-
 
     def do_mating(self):
 
@@ -89,6 +46,13 @@ class SingleRekomb:
             newIndex1 = len(self.population) - 1
             self.population.append(newChromo2)
             newIndex2 = len(self.population) - 1
+
+            sys.stdout.write("Parent1 mit ")
+            sys.stdout.write(str(chromA.get_conflicts()) + " Konflikten: ")
+            chromA.toStr() + "\n"
+            sys.stdout.write("Parent2 mit ")
+            sys.stdout.write(str(chromB.get_conflicts()) + " Konflikten: ")
+            chromB.toStr() + "\n"
 
             #TODO diese Zeile ändern, je nach gewünschter Rekombination (bad funktioniert nur als self.bad...)
             NQueen1.bad_recombination(self, chromA, chromB, newIndex1, newIndex2)
@@ -276,7 +240,7 @@ if __name__ == '__main__':
         sr1 = SingleRekomb(START_SIZE, MAX_EPOCHS, OFFSPRING_PER_GENERATION, MINIMUM_SHUFFLES, MAXIMUM_SHUFFLES,
                       PBC_MAX, MAX_LENGTH)
 
-        sr1.initialize_chromosomes()
+        NQueen1.initialize_chromosomes(sr1)
         sr1.genetic_algorithm()
 
         p1[COUNTER] = sr1.get_conflict_array()[0]
