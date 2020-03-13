@@ -166,8 +166,8 @@ class NDEAP:
             if Chromosome.get_fitness(newChromo1) < Chromosome.get_fitness(thisChromo) or \
                     Chromosome.get_fitness(newChromo1) < Chromosome.get_fitness(thatChromo):
                 sys.stdout.write("Kind1 zu wenig Konflikte: " + str(Chromosome.get_fitness(newChromo2)) + "\n")
-                Chromosome.set_fitness(newChromo1, 2000)
-                sys.stdout.write("Kind1 wurde auf Fitness 2000 erhöht\n")
+                Chromosome.set_fitness(newChromo1, 5000)
+                sys.stdout.write("Kind1 wurde auf Fitness 5000 erhöht\n")
             #
             # Get non-chosens from parent 1
             k = 0
@@ -202,8 +202,8 @@ class NDEAP:
             if Chromosome.get_fitness(newChromo2) < Chromosome.get_fitness(thisChromo) \
                     or Chromosome.get_fitness(newChromo2) < Chromosome.get_fitness(thatChromo):
                 sys.stdout.write("Kind2 zu wenig Konflikte: " + str(Chromosome.get_fitness(newChromo2)) + "\n")
-                Chromosome.set_fitness(newChromo2, 2000)
-                sys.stdout.write("Kind2 wurde auf Fitness 2000 erhöht\n")
+                Chromosome.set_fitness(newChromo2, 5000)
+                sys.stdout.write("Kind2 wurde auf Fitness 5000 erhöht\n")
 
             sys.stdout.write(str(crossPoints) + " CrossPoints\n")
 
