@@ -34,7 +34,8 @@ class SingleRekomb:
 
         return
 
-    def do_mating(self):
+
+    def do_mating(self, recomb):
 
         for i in range(self.mOffspringPerGeneration):
             chromA = self.population[0]
@@ -98,7 +99,17 @@ class SingleRekomb:
         return
 
 
-    def genetic_algorithm(self):
+    def recomb(self, recomb, a, b, c, d):
+        testdata = {
+            0: NQueen1.partially_mapped_crossover(self, a, b, c, d),
+            1: NQueen1.position_based_crossover(self, a, b, c, d),
+            2: NQueen1.order_based_crossover(self, a, b, c, d),
+            3: NQueen1.bad_recombination(self, a, b, c, d)
+        }
+        return testdata.get(recomb, "nothing")
+
+
+    def genetic_algorithm(self, recomb):
 
         done = False
 
@@ -108,7 +119,7 @@ class SingleRekomb:
                 if self.epoch == self.mEpochs:
                     done = True
 
-            self.do_mating()
+            self.do_mating(recomb)
 
             self.prep_next_epoch()
 
@@ -131,6 +142,7 @@ class SingleRekomb:
         plt.title('scatter plot - parents vs offsprings', fontsize=20)
         plt.show()
 
+
 if __name__ == '__main__':
     COUNTER = 0
     END = 500
@@ -138,12 +150,15 @@ if __name__ == '__main__':
     p2 = [0] * END
     k1 = [0] * END
     k2 = [0] * END
+    #TODO rekombination wegen beschriftung austauschen
+    #0= partiallymappd, 1= positionbased, 2=orderbased, 3=bad-positionbased
+    recomb = 1
     while (COUNTER != END):
         sr1 = SingleRekomb(START_SIZE, MAX_EPOCHS, OFFSPRING_PER_GENERATION, MINIMUM_SHUFFLES, MAXIMUM_SHUFFLES,
                       PBC_MAX, MAX_LENGTH)
 
         NQueen1.initialize_chromosomes(sr1)
-        sr1.genetic_algorithm()
+        sr1.genetic_algorithm(recomb)
 
         p1[COUNTER] = sr1.get_conflict_array()[0]
         p2[COUNTER] = sr1.get_conflict_array()[1]
@@ -156,8 +171,8 @@ if __name__ == '__main__':
 
         COUNTER += 1
 
-    OverallPlots.boxplot(p1, p2, k1, k2)
-    OverallPlots.percentage_table(p1, p2, k1, k2)
+    OverallPlots.boxplot(p1, p2, k1, k2, recomb, 0)
+    OverallPlots.percentage_table(p1, p2, k1, k2, recomb, 0)
 
 
 

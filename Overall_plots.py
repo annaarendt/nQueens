@@ -1,31 +1,49 @@
 import matplotlib.pyplot as plt
 
+
 class OverallPlots:
 
-    def show_overall_permutation_amount(array):
+    def recomb_str(recomb):
+        recombis = {
+            0: "partially-mapped",
+            1: "positionbased",
+            2: "orderbased",
+            3: "bad-recomb"
+            }
+        return recombis.get(recomb, "nothing")
+
+
+    def problem_str(problem):
+        problems = {
+            0: "nQueens",
+            1: "Schwefel"
+        }
+        return problems.get(problem, "nothing")
+
+
+    def show_overall_permutation_amount(array, problem):
         permutations = ["partielle_mapped", "position_based", "order_based"]
         colors = ['lightsalmon', 'darkblue', 'gold']
         plt.bar(permutations, array, color=colors)
         plt.ylabel("Anzahl")
-        plt.title("Anzahl der besten Crossover über alle Durchläufe")
+        plt.title("Anzahl der besten Crossover über alle Durchläufe, "+problem)
         plt.show()
         #plt.savefig('overall_permutation_amount.png')
 
         return
 
-    def boxplot(p1, p2, k1, k2):
+    def boxplot(p1, p2, k1, k2, recomb, problem):
         data_to_plot = [p1, p2, k1, k2]
 
-        fig = plt.figure(1, figsize=(9, 6))
-        ax = fig.add_subplot(111)
+        plt.figure(1, figsize=(9, 6))
         plt.ylabel("Fitness")
-        plt.title('Eltern und Kinder')
-        ax.boxplot(data_to_plot)
-        ax.set_xticklabels(['Elternteil1', 'Elternteil2', 'Kind1', 'Kind2'])
+        plt.title('Eltern und Kinder: '+OverallPlots.recomb_str(recomb)+", "+OverallPlots.problem_str(problem))
+        plt.boxplot(data_to_plot)
+        plt.xticks([1,2,3,4],['Elternteil1', 'Elternteil2', 'Kind1', 'Kind2'])
         plt.show()
         return
 
-    def percentage_table(p1, p2, k1, k2):
+    def percentage_table(p1, p2, k1, k2, recomb, problem):
 
         len_array = len(p1)
 
@@ -91,9 +109,9 @@ class OverallPlots:
         w_k1_vs_beide = round((worse_k1_beide / len_array * 100), 2)
         w_k2_vs_beide = round((worse_k2_beide / len_array * 100), 2)
 
-        fig = plt.figure()
-        title = "Durchgänge = " + str(len_array)
-        ax = fig.add_subplot(1, 1, 1)
+        plt.figure()
+        plt.title(OverallPlots.recomb_str(recomb)+", "+OverallPlots.problem_str(problem))
+        title = " Durchgänge = " + str(len_array)
 
         table_data = [
             ["Kind1/Parent1", str(b_k1_vs_p1) + "% / " + str(w_k1_vs_p1) + "%",
@@ -109,11 +127,11 @@ class OverallPlots:
             ["Kind2/beide", str(b_k2_vs_beide) + "% / " + str(w_k2_vs_beide) + "%",
              str(better_k2_beide) + " / " + str(worse_k2_beide)]]
 
-        table = ax.table(cellText=table_data, loc='center',
+        table = plt.table(cellText=table_data, loc='center',
                          colLabels=[title, "Prozentsatz besser/schlechter", "Anzahl besser/schlechter"])
         table.scale(1.2, 1.5)
         table.set_fontsize(20)
-        ax.axis('off')
+        plt.axis('off')
         plt.show()
 
         return

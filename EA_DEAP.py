@@ -5,15 +5,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 from Chromosome import Chromosome
 from ChromosomeBenchmark import ChromosomeDEAP
-from EA import NQueen1
+from EA import NQueen1, MAXIMUM_SHUFFLES, MINIMUM_SHUFFLES
 from Overall_plots import OverallPlots
 
 START_SIZE = 75  # Population size at start.
 MAX_EPOCHS = 1000  # Arbitrary number of test cycles. Default 1000!
 MATING_PROBABILITY = 0.7  # Probability of two chromosomes mating. Range: 0.0 < MATING_PROBABILITY < 1.0
 MUTATION_RATE = 0.001  # Mutation Rate. Range: 0.0 < MUTATION_RATE < 1.0
-#pro mating aber 2 Kinder -> offspring_per_epoche=1 erstellt 2 Kinder von 2 Eltern. wert auf 20 entspricht 40 kinder von
-#40 (nicht unbedignt unterschiedlichn) eltern
 OFFSPRING_PER_GENERATION = 20  # New offspring created per generation. Range: 0 < OFFSPRING_PER_GENERATION < MAX_SELECT.0
 PBC_MAX = 4  # Maximum Position-Based Crossover points. Range: 0 < PBC_MAX < 8 (> 8 isn't good).
 
@@ -30,34 +28,9 @@ MAX_LENGTH = 8 # length of chromosom.
 
 class NDEAP:
     def __init__(self, startSize, maxEpochs, matingProb, mutationRate, generation, pbcMax, maxLength):
-        self.mStartSize = startSize
-        self.mEpochs = maxEpochs
-        self.mMatingProbability = matingProb
-        self.mMutationRate = mutationRate
-        self.mOffspringPerGeneration = generation
-        self.mPBCMax = pbcMax
-        self.mMaxLength = maxLength
+        NQueen1.__init__(self, startSize, maxEpochs, matingProb, mutationRate, generation, MINIMUM_SHUFFLES,
+                 MAXIMUM_SHUFFLES, pbcMax, maxLength)
 
-        self.epoch = 0
-        self.childCount = 0
-        self.nextMutation = 0  # For scheduling mutations.
-        self.mutations = 0
-        self.population = []
-
-        #counter für verschiedene permutationen
-        self.order_based_co = 0
-        self.partielle_mapped_co = 0
-        self.position_based_co = 0
-        self.array_o_b = [0]
-        self.array_p_m = [0]
-        self.array_p_b = [0]
-        self.current_p_m = 0
-        self.current_p_b = 0
-        self.current_o_b = 0
-
-        #variablen für fitness-epochen-plot
-        self.current_best_fitness = 0
-        self.array_fitness = [0]
         return
 
     def get_maximum(self):
@@ -399,7 +372,8 @@ if __name__ == '__main__':
         counter += 1
 
     print(array)
-    OverallPlots.show_overall_permutation_amount(array)
+    #TODO String je nach Problem ändern
+    OverallPlots.show_overall_permutation_amount(array, "Schwefel")
 
 
 

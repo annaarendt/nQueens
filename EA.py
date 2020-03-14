@@ -970,7 +970,7 @@ if __name__ == '__main__':
         counter += 1
 
     print(array)
-    OverallPlots.show_overall_permutation_amount(array)
+    OverallPlots.show_overall_permutation_amount(array, "nQueens")
 
 
 
