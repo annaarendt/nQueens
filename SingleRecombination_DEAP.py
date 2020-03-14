@@ -1,30 +1,27 @@
 import sys
 from Overall_plots import OverallPlots
-from SingleRecombination import SingleRekomb
+from SingleRecombination import SingleRekomb, MINIMUM_SHUFFLES, MAXIMUM_SHUFFLES
 from ChromosomeBenchmark import ChromosomeDEAP
 from Chromosome import Chromosome
-from EA import NQueen1
 from EA_DEAP import NDEAP
+from EA import NQueen1
 
 START_SIZE = 2  # Population size at start.
-MAX_EPOCHS = 0  # Arbitrary number of test cycles. EIGENTLICH AUF 1000 GESETZT!
-OFFSPRING_PER_GENERATION = 1  # New offspring created per generation. Range: 0 < OFFSPRING_PER_GENERATION < MAX_SELECT.
-MINIMUM_SHUFFLES = 8  # For randomizing starting chromosomes
-MAXIMUM_SHUFFLES = 20
+MAX_EPOCHS = 0
+OFFSPRING_PER_GENERATION = 1  #2 nachkommen je 2 eltern
 PBC_MAX = 4  # Maximum Position-Based Crossover points. Range: 0 < PBC_MAX < 8 (> 8 isn't good).
 MAX_LENGTH = 6  # chess board width.
 
 
 class SingleRekomb_bench:
-    def __init__(self, startSize, maxEpochs, generation, minShuffles,
-                 maxShuffles, pbcMax, maxLength):
+    def __init__(self, startSize, maxEpochs, generation, pbcMax, maxLength):
 
-        SingleRekomb.__init__(self, startSize, maxEpochs, generation, minShuffles,
-                 maxShuffles, pbcMax, maxLength)
+        SingleRekomb.__init__(self, startSize, maxEpochs, generation, MINIMUM_SHUFFLES,
+                 MAXIMUM_SHUFFLES, pbcMax, maxLength)
 
         return
 
-    def do_mating(self):
+    def do_mating(self,recomb):
 
         for i in range(self.mOffspringPerGeneration):
             chromA = self.population[0]
@@ -46,6 +43,7 @@ class SingleRekomb_bench:
 
             #TODO NQueen.(gewünschte rekombination), bei bad-recombination NDEAP.bad_recombination
             NQueen1.position_based_crossover(self, chromA, chromB, newIndex1, newIndex2)
+
 
             newChromo1 = self.population[newIndex1]
             # Konsole:
@@ -71,7 +69,7 @@ class SingleRekomb_bench:
         return
 
 
-    def genetic_algorithm(self):
+    def genetic_algorithm(self, recomb):
 
         done = False
 
@@ -81,7 +79,7 @@ class SingleRekomb_bench:
                 if self.epoch == self.mEpochs:
                     done = True
 
-            self.do_mating()
+            self.do_mating(recomb)
 
             SingleRekomb.prep_next_epoch(self)
 
@@ -94,22 +92,25 @@ class SingleRekomb_bench:
 
 if __name__ == '__main__':
     COUNTER = 0
-    END = 500
+    END = 5000
     p1 = [0] * END
     p2 = [0] * END
     k1 = [0] * END
     k2 = [0] * END
+    #TODO umändern wegen Beschriftung
+    #0= partiallymappd, 1= positionbased, 2=orderbased, 3=bad-positionbased
+    recomb=1
     while (COUNTER != END):
-        sr1 = SingleRekomb_bench(START_SIZE, MAX_EPOCHS, OFFSPRING_PER_GENERATION, MINIMUM_SHUFFLES, MAXIMUM_SHUFFLES,
-                      PBC_MAX, MAX_LENGTH)
+        sr1 = SingleRekomb_bench(START_SIZE, MAX_EPOCHS, OFFSPRING_PER_GENERATION, PBC_MAX, MAX_LENGTH)
 
         NDEAP.initialize_chromosomes(sr1)
-        sr1.genetic_algorithm()
+        sr1.genetic_algorithm(recomb)
 
         p1[COUNTER] = SingleRekomb.get_conflict_array(sr1)[0]
         p2[COUNTER] = SingleRekomb.get_conflict_array(sr1)[1]
         k1[COUNTER] = SingleRekomb.get_conflict_array(sr1)[2]
         k2[COUNTER] = SingleRekomb.get_conflict_array(sr1)[3]
+
         #konsole_konflikte je Durchlauf
         str1 = ','.join(str(e) for e in SingleRekomb.get_conflict_array(sr1))
         print("Konflikte: "+str1)
@@ -117,8 +118,8 @@ if __name__ == '__main__':
 
         COUNTER += 1
 
-    OverallPlots.boxplot(p1, p2, k1, k2)
-    OverallPlots.percentage_table(p1, p2, k1, k2)
+    OverallPlots.boxplot(p1, p2, k1, k2, recomb, 1)
+    OverallPlots.percentage_table(p1, p2, k1, k2, recomb, 1)
 
 
 

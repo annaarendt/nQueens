@@ -18,15 +18,10 @@ class Chromosome:
         return
 
     def compute_fitness(self):
-        x = 0
-        y = 0
-        tempx = 0
-        tempy = 0
         board = []
         conflicts = 0
         dx = [-1, 1, -1, 1]
         dy = [-1, 1, 1, -1]
-        done = False
 
         for i in range(self.mMaxLength):
             board.append([""] * self.mMaxLength)

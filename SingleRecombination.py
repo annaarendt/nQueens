@@ -145,7 +145,7 @@ class SingleRekomb:
 
 if __name__ == '__main__':
     COUNTER = 0
-    END = 500
+    END = 5000
     p1 = [0] * END
     p2 = [0] * END
     k1 = [0] * END
