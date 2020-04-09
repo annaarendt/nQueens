@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from Chromosome import Chromosome
 from EA import NQueen1
 from Overall_plots import OverallPlots
+from Operations import Operations
 
 START_SIZE = 2  # Population size at start.
 MAX_EPOCHS = 0  # Arbitrary number of test cycles. EIGENTLICH AUF 1000 GESETZT!
@@ -56,7 +57,7 @@ class SingleRekomb:
             chromB.toStr() + "\n"
 
             #TODO diese Zeile ändern, je nach gewünschter Rekombination (bad funktioniert nur als self.bad...)
-            NQueen1.position_based_crossover(self, chromA, chromB, newIndex1, newIndex2)
+            Operations.position_based_crossover(self, chromA, chromB, newIndex1, newIndex2)
 
             newChromo1 = self.population[newIndex1]
             # Konsole:
@@ -101,10 +102,10 @@ class SingleRekomb:
 
     def recomb(self, recomb, a, b, c, d):
         testdata = {
-            0: NQueen1.partially_mapped_crossover(self, a, b, c, d),
-            1: NQueen1.position_based_crossover(self, a, b, c, d),
-            2: NQueen1.order_based_crossover(self, a, b, c, d),
-            3: NQueen1.bad_recombination(self, a, b, c, d)
+            0: Operations.partially_mapped_crossover(self, a, b, c, d),
+            1: Operations.position_based_crossover(self, a, b, c, d),
+            2: Operations.order_based_crossover(self, a, b, c, d),
+            3: Operations.bad_recombination(self, a, b, c, d)
         }
         return testdata.get(recomb, "nothing")
 

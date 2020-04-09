@@ -5,6 +5,7 @@ from ChromosomeBenchmark import ChromosomeDEAP
 from Chromosome import Chromosome
 from EA_DEAP import NDEAP
 from EA import NQueen1
+from Operations import Operations
 
 START_SIZE = 2  # Population size at start.
 MAX_EPOCHS = 0
@@ -42,7 +43,7 @@ class SingleRekomb_bench:
             Chromosome.toStr(chromB) + "\n"
 
             #TODO NQueen.(gewünschte rekombination), bei bad-recombination NDEAP.bad_recombination
-            NQueen1.position_based_crossover(self, chromA, chromB, newIndex1, newIndex2)
+            Operations.position_based_crossover(self, chromA, chromB, newIndex1, newIndex2)
 
 
             newChromo1 = self.population[newIndex1]
@@ -99,7 +100,7 @@ if __name__ == '__main__':
     k2 = [0] * END
     #TODO umändern wegen Beschriftung
     #0= partiallymappd, 1= positionbased, 2=orderbased, 3=bad-positionbased
-    recomb=1
+    recomb=2
     while (COUNTER != END):
         sr1 = SingleRekomb_bench(START_SIZE, MAX_EPOCHS, OFFSPRING_PER_GENERATION, PBC_MAX, MAX_LENGTH)
 
@@ -118,8 +119,8 @@ if __name__ == '__main__':
 
         COUNTER += 1
 
-    OverallPlots.boxplot(p1, p2, k1, k2, recomb, 1)
-    OverallPlots.percentage_table(p1, p2, k1, k2, recomb, 1)
+    OverallPlots.boxplot(p1, p2, k1, k2, recomb, 3)
+    OverallPlots.percentage_table(p1, p2, k1, k2, recomb, 3)
 
 
 
