@@ -16,12 +16,21 @@ class ChromosomeDEAP:
 
         self.mData = [0] * maxLength
         for i in range(self.mMaxLength):
-            self.mData[i] = random.randrange(-500,500,1)
+            #TODO passende range je nach Funktion auswählen
+            self.mData[i] = random.randrange(-500,500,1) #schwefel
+            #self.mData[i] = random.randrange(-15,30,1) #ackley
+            #self.mData[i] = random.randrange(-6, 6, 1)  # himmelblau
+            #self.mData[i] = random.randrange(-600, 600, 1)  # griewank
+            #self.mData[i] = round(random.uniform(-5.12, 5.12), 2)  # rastrigin
         return
 
     #TODO beliebiges benchmarkproblem einsetzen
     def compute_fitness(self):
         self.mFitness = benchmarks.schwefel(Chromosome.toArray(self))[0]
+        #self.mFitness = benchmarks.ackley(Chromosome.toArray(self))[0]
+        #self.mFitness = benchmarks.himmelblau(Chromosome.toArray(self))[0]
+        #self.mFitness = benchmarks.griewank(Chromosome.toArray(self))[0]
+        #self.mFitness = benchmarks.rastrigin(Chromosome.toArray(self))[0]
         return
 
 

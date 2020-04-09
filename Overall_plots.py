@@ -1,4 +1,6 @@
 import matplotlib.pyplot as plt
+import numpy as np
+from Chromosome import Chromosome
 
 
 class OverallPlots:
@@ -16,19 +18,43 @@ class OverallPlots:
     def problem_str(problem):
         problems = {
             0: "nQueens",
-            1: "Schwefel"
+            1: "Schwefel",
+            2: "Himmelblau",
+            3: "Griewank"
         }
         return problems.get(problem, "nothing")
 
 
     def show_overall_permutation_amount(array, problem):
         permutations = ["partielle_mapped", "position_based", "order_based"]
-        colors = ['lightsalmon', 'darkblue', 'gold']
+        colors = ['midnightblue', 'royalblue', 'lightsteelblue']
         plt.bar(permutations, array, color=colors)
         plt.ylabel("Anzahl")
         plt.title("Anzahl der besten Crossover über alle Durchläufe, "+problem)
         plt.show()
         #plt.savefig('overall_permutation_amount.png')
+
+        return
+
+    def show_overall_minima(minarray, problem):
+        x = np.arange(0, len(minarray), 1)
+        minarray = np.asarray(minarray)
+        y = minarray[x]
+        plt.xlabel('Durchgänge')
+        plt.ylabel('Minimale Fitness')
+        plt.plot(x, y, color = 'darkblue')
+        plt.title("Minima pro Durchlauf " + problem)
+        plt.show()
+        OverallPlots.show_overall_minbox(minarray, problem)
+
+        return
+
+    def show_overall_minbox(minarray, problem):
+
+        plt.ylabel("Fitness")
+        plt.title("Boxplot: Minima pro Durchlauf " + problem)
+        plt.boxplot(minarray)
+        plt.show()
 
         return
 
@@ -133,5 +159,61 @@ class OverallPlots:
         table.set_fontsize(20)
         plt.axis('off')
         plt.show()
+
+        return
+
+    def show_permutation_amount(self):
+        data = [self.partielle_mapped_co, self.position_based_co, self.order_based_co]
+        permutations = ["partielle_mapped", "position_based", "order_based"]
+        colors = ['midnightblue', 'royalblue', 'lightsteelblue']
+        plt.bar(permutations, data, color=colors)
+        plt.ylabel("Anzahl")
+        plt.title("Anzahl der genutzten Crossover")
+        plt.show()
+        #plt.savefig('permutation_amount.png')
+
+        return
+
+    def show_crossover_per_epoche(self):
+        pmarray=np.asarray(self.array_p_m)
+        pbarray=np.asarray(self.array_p_b)
+        obarray=np.asarray(self.array_o_b)
+        x = np.arange(1, self.epoch, 1)
+        #sys.stdout.write(str(x) +" this is it\n")
+        #sys.stdout.write(str(pmarray) + " pmarray\n")
+        y1 = pmarray[x]
+        y2 = pbarray[x]
+        y3 = obarray[x]
+        fig = plt.figure()
+        ax = fig.add_subplot(1, 1, 1)
+        plt.xlabel('Epochen')
+        plt.ylabel('Anzahl')
+        p_m, = ax.plot(x, y1, color='midnightblue', label ='partielle_mapped')
+        p_b, = ax.plot(x, y2, color='royalblue', label ='position_based')
+        o_b, = ax.plot(x, y3, color='lightsteelblue', label ='order_based')
+        ax.legend([p_m, p_b, o_b],["partielle_mapped", "position_based", "order_based"])
+        plt.show()
+        #plt.savefig('crossovers_per_epoche.png')
+
+        return
+
+    def show_fitness_per_epoche(self):
+
+        popSize = len(self.population)
+        fitness_array = [0]
+
+        for i in range(popSize):
+            thisChromo = self.population[i]
+            fitness_array.append(Chromosome.get_fitness(thisChromo))
+        array=np.asarray(self.array_fitness)
+        x = np.arange(1, self.epoch, 1)
+        y1 = array[x]
+        fig = plt.figure()
+        ax = fig.add_subplot(1, 1, 1)
+        plt.xlabel('Epochen')
+        plt.ylabel('Best Fitness/Population')
+        ax.plot(x, y1, color='cornflowerblue', label ='partielle_mapped')
+        plt.show()
+        #plt.savefig('crossovers_per_epoche.png')
 
         return

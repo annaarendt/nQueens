@@ -1,8 +1,3 @@
-
-
-from deap import benchmarks
-
-
 class Chromosome:
     #crossover-type 0,1 oder 2 (partitielle_mapped, position_based und order_based)
     def __init__(self, maxLength, crossover_type):

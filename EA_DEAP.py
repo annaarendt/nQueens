@@ -7,6 +7,7 @@ from Chromosome import Chromosome
 from ChromosomeBenchmark import ChromosomeDEAP
 from EA import NQueen1, MAXIMUM_SHUFFLES, MINIMUM_SHUFFLES
 from Overall_plots import OverallPlots
+from Operations import Operations
 
 START_SIZE = 75  # Population size at start.
 MAX_EPOCHS = 1000  # Arbitrary number of test cycles. Default 1000!
@@ -77,6 +78,7 @@ class NDEAP:
 
         return minimum
 
+    #TODO wieder auf randrange(0,3) umändern
     def initialize_chromosomes(self):
         for i in range(self.mStartSize):
             #crossover des neuen Chromosoms wird bestimmt
@@ -91,127 +93,15 @@ class NDEAP:
 
         return
 
-    def bad_recombination(self, chromA, chromB, child1, child2):
-            tempArray1 = [0] * self.mMaxLength
-            tempArray2 = [0] * self.mMaxLength
-            thisChromo = chromA
-            thatChromo = chromB
-            newChromo1 = self.population[child1]
-            newChromo2 = self.population[child2]
-
-            # Choose and sort the crosspoints.
-            numPoints = random.randrange(0, self.mPBCMax)  # if PBC_MAX is set any higher than 6 or 8.
-            crossPoints = [0] * numPoints
-            for i in range(numPoints):
-                crossPoints[i] = NQueen1.get_exclusive_random_integer_by_array(self, 0, self.mMaxLength - 1,
-                                                                               crossPoints)
-            # Get non-chosens from parent 2: Die Zahlen die bei P2 nicht an den ausgewählten Stellen bei P1 stehen werden in
-            # einem Array gesammelt (tempArray1)
-            k = 0
-            for i in range(self.mMaxLength):
-                matchFound = False
-                for j in range(numPoints):
-                    if Chromosome.get_data(thatChromo, i) == Chromosome.get_data(thisChromo, crossPoints[j]):
-                        matchFound = True
-
-                if matchFound == False:
-                    tempArray1[k] = Chromosome.get_data(thatChromo, i)
-                    k += 1
-            # Insert chosens into child 1: in Child 1 werden die Zahlen von P1 an gewählter Position gesetzt, Rest
-            # freigelassen
-            for i in range(numPoints):
-                Chromosome.set_data(newChromo1, crossPoints[i], Chromosome.get_data(thisChromo, crossPoints[i]))
-
-            # Fill in non-chosens to child 1.
-            k = 0
-            for i in range(self.mMaxLength):
-                matchFound = False
-                for j in range(numPoints):
-                    if i == crossPoints[j]:
-                        matchFound = True
-
-                if matchFound == False:
-                    Chromosome.set_data(newChromo1, i, tempArray1[k])
-                    k += 1
-            newChromo1.compute_fitness()
-
-            # Kind1 wird rausgehauen und index child2 um eins heragesetzt weil sich population auch wieder ändert
-            if Chromosome.get_fitness(newChromo1) < Chromosome.get_fitness(thisChromo) or \
-                    Chromosome.get_fitness(newChromo1) < Chromosome.get_fitness(thatChromo):
-                sys.stdout.write("Kind1 zu wenig Konflikte: " + str(Chromosome.get_fitness(newChromo2)) + "\n")
-                Chromosome.set_fitness(newChromo1, 5000)
-                sys.stdout.write("Kind1 wurde auf Fitness 5000 erhöht\n")
-            #
-            # Get non-chosens from parent 1
-            k = 0
-            for i in range(self.mMaxLength):
-                matchFound = False
-                for j in range(numPoints):
-                    if Chromosome.get_data(thisChromo, i) == Chromosome.get_data(thatChromo, crossPoints[j]):
-                        matchFound = True
-
-                if matchFound == False:
-                    tempArray2[k] = Chromosome.get_data(thisChromo, i)
-                    k += 1
-
-            # Insert chosens into child 2.
-            for i in range(numPoints):
-                Chromosome.set_data(newChromo2, crossPoints[i], Chromosome.get_data(thatChromo, crossPoints[i]))
-
-            # Fill in non-chosens to child 2.
-            k = 0
-            for i in range(self.mMaxLength):
-                matchFound = False
-                for j in range(numPoints):
-                    if i == crossPoints[j]:
-                        matchFound = True
-
-                if matchFound == False:
-                    Chromosome.set_data(newChromo2, i, tempArray2[k])
-                    k += 1
-
-            newChromo2.compute_fitness()
-
-            if Chromosome.get_fitness(newChromo2) < Chromosome.get_fitness(thisChromo) \
-                    or Chromosome.get_fitness(newChromo2) < Chromosome.get_fitness(thatChromo):
-                sys.stdout.write("Kind2 zu wenig Konflikte: " + str(Chromosome.get_fitness(newChromo2)) + "\n")
-                Chromosome.set_fitness(newChromo2, 5000)
-                sys.stdout.write("Kind2 wurde auf Fitness 5000 erhöht\n")
-
-            sys.stdout.write(str(crossPoints) + " CrossPoints\n")
-
-            sys.stdout.write("BAD_recombination verwendet.\n")
-            return
-
-
-
-    #ersetzt eine gene durch eine zufällig Anderen [-500,500,1]
-    def new_gene_mutation(self, index):
-
-        thisChromo = self.population[index]
-        point1 = random.randrange(0, self.mMaxLength)
-
-        sys.stdout.write("Punkt: "+str(point1)+", Vorher: " + str(Chromosome.toStr(thisChromo) + "\n"))
-
-        rand= random.randrange(-500,500,1)
-        Chromosome.set_data(thisChromo, point1, rand)
-
-        sys.stdout.write("New_Gene_Mutation verwendet.\n")
-        sys.stdout.write("Nachher: "+str(Chromosome.toStr(thisChromo)+"\n"))
-        self.mutations += 1
-
-        return
-
-
     #wenn die eltern verschiedene crossover haben wird das übernommen von dem elternteil bessere fitness hat
     def do_mating(self):
         for i in range(self.mOffspringPerGeneration):
-            parentA = NQueen1.choose_first_parent(self)
+            parentA = Operations.choose_first_parent(self)
             # Test probability of mating.
             getRand = random.randrange(0, 100)
 
             if getRand <= self.mMatingProbability * 100:
-                parentB = NQueen1.choose_second_parent(self, parentA)
+                parentB = Operations.choose_second_parent(self, parentA)
                 #das crossover des Elternteils mit größerer Fitness wird gewählt
                 chromA = self.population[parentA]
                 chromB = self.population[parentB]
@@ -228,7 +118,7 @@ class NDEAP:
                     newIndex1 = len(self.population) - 1
                     self.population.append(newChromo2)
                     newIndex2 = len(self.population) - 1
-                    NQueen1.partially_mapped_crossover(self, chromA, chromB, newIndex1, newIndex2)
+                    Operations.partially_mapped_crossover(self, chromA, chromB, newIndex1, newIndex2)
                     self.partielle_mapped_co += 1
                     self.current_p_m +=1
                 elif type == 1:
@@ -239,8 +129,8 @@ class NDEAP:
                     self.population.append(newChromo2)
                     newIndex2 = len(self.population) - 1
                     # TODO entweder positionbased crossover oder bad_recombination, beides crossover-typ 1
-                    self.bad_recombination(chromA, chromB, newIndex1, newIndex2)
-                    #NQueen1.position_based_crossover(self, chromA, chromB, newIndex1, newIndex2)
+                    #Operations.bad_recombination_deap(chromA, chromB, newIndex1, newIndex2)
+                    Operations.position_based_crossover(self, chromA, chromB, newIndex1, newIndex2)
                     self.position_based_co += 1
                     self.current_p_b += 1
                 else:
@@ -250,16 +140,18 @@ class NDEAP:
                     newIndex1 = len(self.population) - 1
                     self.population.append(newChromo2)
                     newIndex2 = len(self.population) - 1
-                    NQueen1.order_based_crossover(self, chromA, chromB, newIndex1, newIndex2)
+                    Operations.order_based_crossover(self, chromA, chromB, newIndex1, newIndex2)
                     self.order_based_co += 1
                     self.current_o_b += 1
 
 
                 if self.childCount - 1 == self.nextMutation:
+                    #Operations.new_gene_mutation(self,newIndex1)
+                    Operations.exchange_mutation(self, newIndex1, 1)
 
-                    self.new_gene_mutation(newIndex1)
                 elif self.childCount == self.nextMutation:
-                    self.new_gene_mutation(newIndex2)
+                    #self.new_gene_mutation(newIndex2)
+                    Operations.exchange_mutation(self, newIndex2, 1)
 
 
                 newChromo1 = self.population[newIndex1]
@@ -271,8 +163,8 @@ class NDEAP:
                 self.childCount += 1
 
                 # Schedule next mutation.
-                if math.fmod(self.childCount, NQueen1.math_round(self, 1.0 / self.mMutationRate)) == 0:
-                    self.nextMutation = self.childCount + random.randrange(0, NQueen1.math_round(self, 1.0 / self.mMutationRate))
+                if math.fmod(self.childCount, Operations.math_round(self, 1.0 / self.mMutationRate)) == 0:
+                    self.nextMutation = self.childCount + random.randrange(0, Operations.math_round(self, 1.0 / self.mMutationRate))
 
         return
 
@@ -281,7 +173,7 @@ class NDEAP:
         done = False
 
         self.mutations = 0
-        self.nextMutation = random.randrange(0, NQueen1.math_round(self, 1.0 / self.mMutationRate))
+        self.nextMutation = random.randrange(0, Operations.math_round(self, 1.0 / self.mMutationRate))
 
         while not done:
             popSize = len(self.population)
@@ -290,13 +182,13 @@ class NDEAP:
                 if Chromosome.get_fitness(thisChromo) == 0 or self.epoch == self.mEpochs:
                     done = True
 
-            NQueen1.get_fitness(self)
+            Operations.get_fitness(self)
 
-            NQueen1.roulette_selection(self)
+            Operations.roulette_selection(self)
 
             self.do_mating()
 
-            NQueen1.prep_next_epoch(self)
+            Operations.prep_next_epoch(self)
 
             self.array_p_m.append(self.current_p_m)
             self.array_p_b.append(self.current_p_b)
@@ -318,7 +210,8 @@ class NDEAP:
                 thisChromo = self.population[i]
                 if Chromosome.get_fitness(thisChromo) == 0:
                     sys.stdout.write(str(Chromosome.toStr(thisChromo))+" hat " + str(Chromosome.get_fitness(thisChromo)) + " fitness.\n")
-                    NQueen1.print_best_solution(self, thisChromo)
+                    Operations.set_foundMimimum(self, 1)
+                    #NQueen1.print_best_solution(self, thisChromo)
                     break
 
         sys.stdout.write("Completed " + str(self.epoch) + " epochs.\n")
@@ -331,6 +224,7 @@ class NDEAP:
 
         return
 
+    """
     def show_fitness_per_epoche(self):
 
         popSize = len(self.population)
@@ -346,16 +240,19 @@ class NDEAP:
         ax = fig.add_subplot(1, 1, 1)
         plt.xlabel('Epochen')
         plt.ylabel('Best Fitness/Population')
-        ax.plot(x, y1, color='orange', label ='partielle_mapped')
+        ax.plot(x, y1, color='cornflowerblue', label ='partielle_mapped')
         plt.show()
         #plt.savefig('crossovers_per_epoche.png')
 
         return
+        """
 
 if __name__ == '__main__':
+    foundMinimum = 0
     array = [0, 0, 0]
     counter = 0
-    while(counter != 10):
+    minarray = []
+    while(counter != 3):
         print("_________________________________________________________________")
         sys.stdout.write("COUNTER: " + str(counter)+"\n")
         nSch = NDEAP(START_SIZE, MAX_EPOCHS, MATING_PROBABILITY, MUTATION_RATE, OFFSPRING_PER_GENERATION,
@@ -364,16 +261,36 @@ if __name__ == '__main__':
         nSch.initialize_chromosomes()
         nSch.genetic_algorithm()
         #zeige pro Durchlauf permutation-Anzahl und permutationen pro Epoche
-        NQueen1.show_permutation_amount(nSch)
-        NQueen1.show_crossover_per_epoche(nSch)
-        nSch.show_fitness_per_epoche()
+        OverallPlots.show_permutation_amount(nSch)
+        #OverallPlots.show_crossover_per_epoche(nSch)
+        OverallPlots.show_fitness_per_epoche(nSch)
 
-        array = np.array(array) + NQueen1.get_best_crossover(nSch)
+        array = np.array(array) + Operations.get_best_crossover(nSch)
+
+        foundMinimum += Operations.get_foundMimimum(nSch)
+        minarray.append(Operations.get_best(nSch))
+
         counter += 1
 
     print(array)
     #TODO String je nach Problem ändern
     OverallPlots.show_overall_permutation_amount(array, "Schwefel")
+    #OverallPlots.show_overall_permutation_amount(array, "Himmelblau")
+    #OverallPlots.show_overall_permutation_amount(array, "Griewank")
+    #OverallPlots.show_overall_permutation_amount(array, "Rastrigin")
+
+    sys.stdout.write("minArray: "+str(minarray)+"\n")
+
+    OverallPlots.show_overall_minima(minarray, "Schwefel")
+    #OverallPlots.show_overall_minima(minarray, "Himmelblau")
+    #OverallPlots.show_overall_minima(minarray, "Griewank")
+    #OverallPlots.show_overall_minima(minarray, "Rastrigin")
+
+
+
+    sys.stdout.write("Gefundene Minima: "+str(foundMinimum)+"\n")
+    sys.stdout.write("Median aller Minima: " + str(np.median(minarray)) + "\n")
+
 
 
 
