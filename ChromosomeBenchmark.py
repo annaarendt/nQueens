@@ -6,7 +6,7 @@ from Chromosome import Chromosome
 
 
 class ChromosomeDEAP:
-    #crossover-type 0,1 oder 2 (partitielle_mapped, position_based und order_based)
+    #crossover-type 0,1, 2 oder 3 (partitially_mapped, position_based, two_point und order_based)
     def __init__(self, maxLength, crossover_type):
         self.mMaxLength = maxLength
         self.mSelected = False

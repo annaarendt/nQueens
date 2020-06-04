@@ -1,7 +1,6 @@
 import math
 import random
 import sys
-import matplotlib.pyplot as plt
 import numpy as np
 from Chromosome import Chromosome
 from Overall_plots import OverallPlots
@@ -18,7 +17,7 @@ class Operations:
         newChromo2 = self.population[child2]
 
         # Choose and sort the crosspoints.
-        numPoints = random.randrange(0, self.mPBCMax)  # if PBC_MAX is set any higher than 6 or 8.
+        numPoints = random.randrange(0, self.mPBCMax)  # wenn PBC_MAX höher als 6 or 8.
         crossPoints = [0] * numPoints
         for i in range(numPoints):
             crossPoints[i] = Operations.get_exclusive_random_integer_by_array(self, 0, self.mMaxLength - 1, crossPoints)
@@ -54,9 +53,7 @@ class Operations:
 
         #Kind1 wird rausgehauen und index child2 um eins heragesetzt weil sich population auch wieder ändert
         if newChromo1.get_fitness() < thisChromo.get_fitness() or newChromo1.get_fitness() < thatChromo.get_fitness():
-            #sys.stdout.write("Kind1 zu wenig Konflikte: " + str(newChromo2.get_fitness()) + "\n")
             newChromo1.set_fitness(18)
-            #sys.stdout.write("Kind1 wurde auf 18 Konlikte erhöht\n")
 #
         # Get non-chosens from parent 1
         k = 0
@@ -93,9 +90,39 @@ class Operations:
             newChromo2.set_fitness(18)
             sys.stdout.write("Kind2 wurde auf 18 Konlikte erhöht\n")
 
-        #sys.stdout.write(str(crossPoints) + " CrossPoints\n")
 
         sys.stdout.write("BAD_recombination verwendet.\n")
+        return
+
+    def two_point_crossover(self, chromA, chromB, child1, child2):
+        thisChromo = chromA
+        thatChromo = chromB
+        newChromo1 = self.population[child1]
+        newChromo2 = self.population[child2]
+
+        # Sample the 2 crossover points randomly
+        cp1 = np.random.randint(self.mMaxLength)
+        cp2 = np.random.randint(self.mMaxLength)
+
+        # Avoid that cp1 and cp2 are equal
+        while cp1 == cp2:
+            cp2 = np.random.randint(self.mMaxLength)
+
+        # Swap if cp1 is bigger than cp2 (otherwise array slicing won't work)
+        if cp1 > cp2:
+            cp1, cp2 = cp2, cp1
+
+        # Copy Parent genes to offspring.
+        for i in range(self.mMaxLength):
+            Chromosome.set_data(newChromo1, i, Chromosome.get_data(thisChromo, i))
+            Chromosome.set_data(newChromo2, i, Chromosome.get_data(thatChromo, i))
+
+        newChromo1.mData[cp1:cp2], newChromo2.mData[cp1:cp2] = newChromo2.mData[cp1:cp2], newChromo1.mData[cp1:cp2]
+
+
+        newChromo1.compute_fitness()
+        newChromo2.compute_fitness()
+
         return
 
     def partially_mapped_crossover(self, chromA, chromB, child1, child2):
@@ -150,8 +177,6 @@ class Operations:
             newChromo1.compute_fitness()
             newChromo2.compute_fitness()
 
-        # sys.stdout.write(str(crossPoint1) + " CrossPoints, ")
-        # sys.stdout.write(str(crossPoint2) + " CrossPoints\n")
 
         return
 
@@ -301,9 +326,7 @@ class Operations:
                     matchFound = True
 
             if matchFound == True:
-                #testen ob cpoints leer ist
-                if cpoints :
-                    # TODO diese if-Abfrage war nur quickfix
+                if cpoints:
                     if k < numPoints:
                         cpoints[k] = i
                         k += 1
@@ -328,7 +351,6 @@ class Operations:
         # Lücken in tempArray werden mit Zahlen von numbers aufgefüllt
         k = 0
         # hier wird gecheckt ob crossNumbers leer ist, wenn ja wird nichts gemacht
-        #TODO exception bearbeiten
         if numbers:
             for i in range(self.mMaxLength):
                 if tempArray[i] == 0:
@@ -340,7 +362,7 @@ class Operations:
                             tempArray[i] = numbers[k]
                             k += 1
                         except IndexError:
-                            sys.stdout.write(str(k)+" :k, schiefgelaufen.. i: "+str(i)+ "\n")
+                            sys.stdout.write(str(k)+" :k, Endphase.. i: "+str(i)+ "\n")
 
 
         return tempArray
@@ -357,7 +379,7 @@ class Operations:
             numPoints = random.randrange(0, self.mPBCMax)  # if PBC_MAX is set any higher than 6 or 8.
             crossPoints = [0] * numPoints
             for i in range(numPoints):
-                crossPoints[i] = NQueen1.get_exclusive_random_integer_by_array(self, 0, self.mMaxLength - 1,
+                crossPoints[i] = Operations.get_exclusive_random_integer_by_array(self, 0, self.mMaxLength - 1,
                                                                                crossPoints)
             # Get non-chosens from parent 2: Die Zahlen die bei P2 nicht an den ausgewählten Stellen bei P1 stehen werden in
             # einem Array gesammelt (tempArray1)
@@ -471,14 +493,15 @@ class Operations:
         done = False
 
         thisChromo = self.population[index]
-        #sys.stdout.write("Vorher: " + str(Chromosome.toStr(thisChromo) + "\n"))
+        sys.stdout.write("Zahl exchange: " + str(exchanges) + "\n")
+        sys.stdout.write("Vorher: " + str(Chromosome.toStr(thisChromo) + "\n"))
 
         while not done:
             gene1 = random.randrange(0, self.mMaxLength)
             gene2 = Operations.get_exclusive_random_integer(self, self.mMaxLength, gene1)
 
             # Exchange the chosen genes.
-            tempData = Chromosome.get_data(thisChromo,gene1)
+            tempData = Chromosome.get_data(thisChromo, gene1)
             Chromosome.set_data(thisChromo, gene1, Chromosome.get_data(thisChromo, gene2))
             Chromosome.set_data(thisChromo, gene2, tempData)
 
@@ -486,7 +509,7 @@ class Operations:
                 done = True
 
             i += 1
-        #sys.stdout.write("Nachher: "+str(Chromosome.toStr(thisChromo)+"\n"))
+        sys.stdout.write("Nachher: "+str(Chromosome.toStr(thisChromo)+"\n"))
         thisChromo.compute_fitness()
 
         self.mutations += 1
@@ -499,7 +522,6 @@ class Operations:
         tempArray2 = [0] * self.mMaxLength
         thisChromo = self.population[index]
 
-        sys.stdout.write("Vorher: " + str(Chromosome.toStr(thisChromo) + "\n"))
 
         # Randomly choose a section to be displaced.
         point1 = random.randrange(0, self.mMaxLength)
@@ -534,7 +556,6 @@ class Operations:
 
         self.mutations += 1
         sys.stdout.write("Displacement Mutation verwendet.\n")
-        sys.stdout.write("Nachher: " + str(Chromosome.toStr(thisChromo) + "\n"))
 
         return
 
@@ -544,13 +565,10 @@ class Operations:
         thisChromo = self.population[index]
         point1 = random.randrange(0, self.mMaxLength)
 
-        sys.stdout.write("Punkt: "+str(point1)+", Vorher: " + str(Chromosome.toStr(thisChromo) + "\n"))
-
         rand= random.randrange(-500,500,1)
         Chromosome.set_data(thisChromo, point1, rand)
 
         sys.stdout.write("New_Gene_Mutation verwendet.\n")
-        sys.stdout.write("Nachher: "+str(Chromosome.toStr(thisChromo)+"\n"))
         thisChromo.compute_fitness()
         self.mutations += 1
 
@@ -575,15 +593,12 @@ class Operations:
             worst = self.population[self.get_maximum()]
 
             thisChromo = self.population[i]
-            #sys.stdout.write(str(thisChromo.get_conflicts()) + " Konflikte\n")
             if genTotal != 0:
                 probability = ((Chromosome.get_fitness(worst) - Chromosome.get_fitness(thisChromo)) / genTotal)
             else:
                 probability = 0
-            #sys.stdout.write("("+str(worst.get_conflicts()) + " - "+str(thisChromo.get_conflicts())+ ") / "+str(genTotal)+" =\n")
             sumProp += probability
             Chromosome.set_selection_probability(thisChromo, probability)
-            #sys.stdout.write(str(probability) + " probability von chromosom\n")
 
         sys.stdout.write(str(round(sumProp, 3)) + " alle Props\n")
 
@@ -603,7 +618,6 @@ class Operations:
                     else:
                         thatChromo = self.population[j - 1]
 
-                    #sys.stdout.write("im while eins selected\n")
                     Chromosome.set_selected(thatChromo, True)
                     done = True
                 else:
@@ -613,7 +627,6 @@ class Operations:
                 #der anzahl an Nachwüchsen selected
                 if sumProp == 0:
                     Chromosome.set_selected(self.population[i],True)
-                    #sys.stdout.write("im while i selected\n")
                     done = True
 
         return
@@ -624,14 +637,12 @@ class Operations:
         counter = 0
 
         while not done and counter < 100:
-            #print("sucht ersten Parent")
             # Randomly choose an eligible parent.
             counter += 1
             #print(counter)
             parent = random.randrange(0, len(self.population) - 1)
             thisChromo = self.population[parent]
             if Chromosome.get_selected(thisChromo) == True:
-                #print("1. Parent gefunden")
                 done = True
 
         return parent
@@ -648,15 +659,12 @@ class Operations:
             for i in range (len(self.population)):
                 if Chromosome.get_selected(self.population[i]) == True:
                     probe_counter += 1
-                    #sys.stdout.write(str(probe_counter) +" "+ str(self.population[i].toStr())+ ".Chromosom ist Selected.\n")
 
             # Randomly choose an eligible parent.
             parentB = random.randrange(0, len(self.population) - 1)
             if parentB != parentA:
                 thisChromo = self.population[parentB]
-                #sys.stdout.write(str(Chromosome.get_selected(thisChromo))+"\n")
                 if Chromosome.get_selected(thisChromo) == True:
-                    #sys.stdout.write("2. parent gefunden\n")
                     done = True
             #im Falle, dass nur ein Chromosom selected wurde (im Falle von alle Konflikte sind 0), wird ein zufälliges
             #Chromosom als zweiten Parent gewählt
@@ -671,7 +679,6 @@ class Operations:
     def get_fitness(self):
         #fitness entspricht den Konflikten. Niedrige Fitness ist gut, hohe ist schlecht
         popSize = len(self.population)
-        sys.stdout.write(str(len(self.population)) + " Länge der Population..Fitness:\n")
 
         for i in range(popSize):
             thisChromo = self.population[i]
@@ -679,11 +686,9 @@ class Operations:
             self.worst = Chromosome.get_fitness(worst)
             best = self.population[self.get_minimum()]
             self.best = Chromosome.get_fitness(best)
-            sys.stdout.write(str(Chromosome.get_fitness(thisChromo))
-                             + ", ")
 
-        sys.stdout.write("\n"+str(Chromosome.get_fitness(worst)) + ": Maximale Fitness\n")
-        sys.stdout.write(str(Chromosome.get_fitness(best)) + ": Minimale Fitness\n")
+        #sys.stdout.write("\n"+str(Chromosome.get_fitness(worst)) + ": Maximale Fitness\n")
+        #sys.stdout.write(str(Chromosome.get_fitness(best)) + ": Minimale Fitness\n")
         self.current_best_fitness = Chromosome.get_fitness(best)
         self.array_fitness.append(self.current_best_fitness)
 
@@ -699,16 +704,13 @@ class Operations:
 
     def prep_next_epoch(self):
         popSize = len(self.population)
-        #sys.stdout.write(str(len(self.population)) + " :Länge der Population..in prep next epoch 1.0\n")
         #schlechten Individuen rauslöschen und Zahl der Population wieder auf Startzahl anpassen
 
         for i in range(popSize):
             while len(self.population) > self.mStartSize:
                 #worst=self.population[self.get_maximum()]
-                #sys.stdout.write(str(self.population[self.get_maximum()].get_conflicts()) + " KONFLIKTE DES SCHELCHTESTEN\n")
                 self.population.pop(self.get_maximum())
 
-        #sys.stdout.write(str(len(self.population)) + " :Länge der Population..in prep next epoch 2.0\n")
 
         popSize = len(self.population)
         # Reset flags for selected individuals.
@@ -735,16 +737,23 @@ class Operations:
         pb = self.position_based_co
         ob = self.order_based_co
         pm = self.partielle_mapped_co
-        if(pm >= pb and pm >= ob):
-            array = [1, 0, 0]
+        tp = self.two_point_co
+        if(pm >= pb and pm >= ob and pm >= tp):
+            array = [1, 0, 0,0]
             print("PM IS BEST")
-        elif(pb >= pm and pb >= ob):
-            array = [0, 1, 0]
+        elif(pb >= pm and pb >= ob and pb >= tp):
+            array = [0, 1, 0,0]
             print("PB IS BEST")
+        elif(tp >= pm and tp >= ob and tp >= pb):
+            array = [0, 0, 1,0]
+            print("TP IS BEST")
         else:
-            array = [0, 0, 1]
+            array = [0, 0, 0,1]
             print("OB IS BEST")
 
 
         return np.array(array)
+
+
+
 

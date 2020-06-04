@@ -27,9 +27,9 @@ class SingleRekomb_bench:
         for i in range(self.mOffspringPerGeneration):
             chromA = self.population[0]
             chromB = self.population[1]
-
-            newChromo1 = ChromosomeDEAP(self.mMaxLength, 0)
-            newChromo2 = ChromosomeDEAP(self.mMaxLength, 0)
+            #crossovertyp ist hier egal
+            newChromo1 = ChromosomeDEAP(self.mMaxLength, 2)
+            newChromo2 = ChromosomeDEAP(self.mMaxLength, 2)
             self.population.append(newChromo1)
             newIndex1 = len(self.population) - 1
             self.population.append(newChromo2)
@@ -43,7 +43,7 @@ class SingleRekomb_bench:
             Chromosome.toStr(chromB) + "\n"
 
             #TODO NQueen.(gewünschte rekombination), bei bad-recombination NDEAP.bad_recombination
-            Operations.position_based_crossover(self, chromA, chromB, newIndex1, newIndex2)
+            Operations.partially_mapped_crossover(self, chromA, chromB, newIndex1, newIndex2)
 
 
             newChromo1 = self.population[newIndex1]
@@ -99,8 +99,8 @@ if __name__ == '__main__':
     k1 = [0] * END
     k2 = [0] * END
     #TODO umändern wegen Beschriftung
-    #0= partiallymappd, 1= positionbased, 2=orderbased, 3=bad-positionbased
-    recomb=2
+    #0= partiallymappd, 1= positionbased, 2=twopoint, 3=orderbased, 4=bad-positionbased
+    recomb=0
     while (COUNTER != END):
         sr1 = SingleRekomb_bench(START_SIZE, MAX_EPOCHS, OFFSPRING_PER_GENERATION, PBC_MAX, MAX_LENGTH)
 
@@ -119,8 +119,9 @@ if __name__ == '__main__':
 
         COUNTER += 1
 
-    OverallPlots.boxplot(p1, p2, k1, k2, recomb, 3)
-    OverallPlots.percentage_table(p1, p2, k1, k2, recomb, 3)
+    #Probleme: 1: "Schwefel", 2: "Himmelblau", 3: "Griewank"
+    OverallPlots.boxplot(p1, p2, k1, k2, recomb, 1)
+    OverallPlots.percentage_table(p1, p2, k1, k2, recomb, 1)
 
 
 

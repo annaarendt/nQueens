@@ -1,7 +1,6 @@
 import math
 import random
 import sys
-import matplotlib.pyplot as plt
 import numpy as np
 from Chromosome import Chromosome
 from Overall_plots import OverallPlots
@@ -20,12 +19,6 @@ PBC_MAX = 4  # Maximum Position-Based Crossover points. Range: 0 < PBC_MAX < 8 (
 
 MAX_LENGTH = 10 # chess board width.
 
-
-#welcher crossover für welche phase besser
-#mutation von corssover und crossover fixen, auf viele durchgänge testen
-
-#eltern nicht ganzwegschmeiße. kinder erezugen random , zsm schmeisen und dann die besten kinder weiternehmen.
-#vlt. nur ein kind? crossover dass das beste weitergegeben werden
 
 
 class NQueen1:
@@ -51,12 +44,15 @@ class NQueen1:
         self.order_based_co = 0
         self.partielle_mapped_co = 0
         self.position_based_co = 0
+        self.two_point_co = 0
         self.array_o_b = [0]
         self.array_p_m = [0]
         self.array_p_b = [0]
+        self.array_t_p = [0]
         self.current_p_m = 0
         self.current_p_b = 0
         self.current_o_b = 0
+        self.current_t_p = 0
 
         #boolean voariable ob minimum gefunden wurde
         self.found_mimimum = 0
@@ -117,7 +113,7 @@ class NQueen1:
     def initialize_chromosomes(self):
         for i in range(self.mStartSize):
             #crossover des neuen Chromosoms wird bestimmt
-            rand = random.randrange(0, 3)
+            rand = random.randrange(0, 4)
 
             newChromo = Chromosome(self.mMaxLength, rand)
             self.population.append(newChromo)
@@ -172,11 +168,25 @@ class NQueen1:
                     newIndex2 = len(self.population) - 1
                     # TODO entweder positionbased crossover oder bad_recombination_qu, beides crossover-typ 1
                     Operations.position_based_crossover(self, chromA, chromB, newIndex1, newIndex2)
+                    #Operations.two_point_crossover(self, chromA, chromB, newIndex1, newIndex2)
                     self.position_based_co += 1
                     self.current_p_b += 1
-                else:
+                elif type == 2:
                     newChromo1 = Chromosome(self.mMaxLength, 2)
                     newChromo2 = Chromosome(self.mMaxLength, 2)
+                    self.population.append(newChromo1)
+                    newIndex1 = len(self.population) - 1
+                    self.population.append(newChromo2)
+                    newIndex2 = len(self.population) - 1
+                    Operations.two_point_crossover(self, chromA, chromB, newIndex1, newIndex2)
+                    #Operations.position_based_crossover(self, chromA, chromB, newIndex1, newIndex2)
+                    self.two_point_co += 1
+                    self.current_t_p += 1
+
+                else:
+
+                    newChromo1 = Chromosome(self.mMaxLength, 3)
+                    newChromo2 = Chromosome(self.mMaxLength, 3)
                     self.population.append(newChromo1)
                     newIndex1 = len(self.population) - 1
                     self.population.append(newChromo2)
@@ -198,17 +208,9 @@ class NQueen1:
 
 
                 newChromo1 = self.population[newIndex1]
-                # Konsole:
-                #sys.stdout.write("Kind1 mit ")
-                #sys.stdout.write(str(newChromo1.get_fitness()) + " Konflikten: ")
-                #newChromo1.toStr() + "\n"
                 self.childCount += 1
 
                 newChromo2 = self.population[newIndex2]
-                # Konsole:
-                #sys.stdout.write("Kind2 mit ")
-                #sys.stdout.write(str(newChromo2.get_fitness()) + " Konflikten: ")
-                #newChromo2.toStr() + "\n"
                 self.childCount += 1
 
                 # Schedule next mutation.
@@ -261,21 +263,18 @@ class NQueen1:
             self.array_p_m.append(self.current_p_m)
             self.array_p_b.append(self.current_p_b)
             self.array_o_b.append(self.current_o_b)
+            self.array_t_p.append(self.current_t_p)
             self.current_p_m = 0
             self.current_p_b = 0
             self.current_o_b = 0
+            self.current_t_p = 0
 
             self.epoch += 1
-
-            #sys.stdout.write(str(self.array_p_m)+" ARRAY_P_M\n")
-            #sys.stdout.write(str(self.array_p_b) + " ARRAY_P_B\n")
-            #sys.stdout.write(str(self.array_o_b) + " ARRAY_O_B\n")
 
             # This is here simply to show the runtime status.
             sys.stdout.write("Epoche: " + str(self.epoch) + "\n")
 
         sys.stdout.write("done.\n")
-        #sys.stdout.write(str(max(self.array_p_m)) + " maximale Value.\n")
 
         if self.epoch != self.mEpochs:
             popSize = len(self.population)
@@ -293,17 +292,17 @@ class NQueen1:
         sys.stdout.write(
             "Encountered " + str(self.partielle_mapped_co) + " partiell-mapped , " +
             str(self.position_based_co) + " positioon-based and " + str(self.order_based_co)
-            + " order-based Crossover.\n")
+            + " order-based Crossover." + str(self.two_point_co)+ " two-point Crossover.\n")
 
         return
 
 
 if __name__ == '__main__':
     foundMinimum = 0
-    array = [0, 0, 0]
+    array = [0, 0, 0, 0]
     counter = 0
     minarray = []
-    while(counter != 3):
+    while(counter != 100):
         print("_________________________________________________________________")
         sys.stdout.write("COUNTER: " + str(counter)+"\n")
         nq1 = NQueen1(START_SIZE, MAX_EPOCHS, MATING_PROBABILITY, MUTATION_RATE, OFFSPRING_PER_GENERATION,
@@ -312,7 +311,7 @@ if __name__ == '__main__':
         nq1.initialize_chromosomes()
         nq1.genetic_algorithm()
         #zeige pro Druchlauf permutation-Anzahl und permutationen pro Epoche
-        #nq1.show_permutation_amount()
+        OverallPlots.show_permutation_amount(nq1)
         OverallPlots.show_crossover_per_epoche(nq1)
 
         array = np.array(array) + Operations.get_best_crossover(nq1)

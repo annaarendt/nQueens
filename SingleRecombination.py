@@ -56,7 +56,7 @@ class SingleRekomb:
             sys.stdout.write(str(chromB.get_fitness()) + " Konflikten: ")
             chromB.toStr() + "\n"
 
-            #TODO diese Zeile ändern, je nach gewünschter Rekombination (bad funktioniert nur als self.bad...)
+            #TODO diese Zeile ändern, je nach gewünschter Rekombination
             Operations.position_based_crossover(self, chromA, chromB, newIndex1, newIndex2)
 
             newChromo1 = self.population[newIndex1]
@@ -104,8 +104,9 @@ class SingleRekomb:
         testdata = {
             0: Operations.partially_mapped_crossover(self, a, b, c, d),
             1: Operations.position_based_crossover(self, a, b, c, d),
-            2: Operations.order_based_crossover(self, a, b, c, d),
-            3: Operations.bad_recombination(self, a, b, c, d)
+            2: Operations.two_point_crossover(self, a, b, c, d),
+            3: Operations.order_based_crossover(self, a, b, c, d),
+            4: Operations.bad_recombination(self, a, b, c, d)
         }
         return testdata.get(recomb, "nothing")
 
@@ -151,8 +152,8 @@ if __name__ == '__main__':
     p2 = [0] * END
     k1 = [0] * END
     k2 = [0] * END
-    #TODO rekombination wegen beschriftung austauschen
-    #0= partiallymappd, 1= positionbased, 2=orderbased, 3=bad-positionbased
+    #TODO rekombination wegen beschriftung austauschen und in do_mating() ändern!!
+    #0= partiallymappd, 1= positionbased, 2=twopoint, 3=orderbased, 4=bad-positionbased
     recomb = 1
     while (COUNTER != END):
         sr1 = SingleRekomb(START_SIZE, MAX_EPOCHS, OFFSPRING_PER_GENERATION, MINIMUM_SHUFFLES, MAXIMUM_SHUFFLES,
@@ -172,8 +173,8 @@ if __name__ == '__main__':
 
         COUNTER += 1
 
-    OverallPlots.boxplot(p1, p2, k1, k2, recomb, 0)
-    OverallPlots.percentage_table(p1, p2, k1, k2, recomb, 0)
+    OverallPlots.boxplot(p1, p2, k1, k2, recomb, 1)
+    OverallPlots.percentage_table(p1, p2, k1, k2, recomb, 1)
 
 
 

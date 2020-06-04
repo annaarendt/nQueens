@@ -1,7 +1,6 @@
 import math
 import random
 import sys
-import matplotlib.pyplot as plt
 import numpy as np
 from Chromosome import Chromosome
 from ChromosomeBenchmark import ChromosomeDEAP
@@ -17,14 +16,6 @@ OFFSPRING_PER_GENERATION = 20  # New offspring created per generation. Range: 0 
 PBC_MAX = 4  # Maximum Position-Based Crossover points. Range: 0 < PBC_MAX < 8 (> 8 isn't good).
 
 MAX_LENGTH = 8 # length of chromosom.
-
-
-#welcher crossover für welche phase besser
-#mutaion von corssover und crossover fixen, auf viele durchgänge testen
-#eine schlechte rekombinationsmethode implementieren zum testen
-
-#eltern nicht ganzwegschmeiße. kinder erezugen random , zsm schmeisen und dann die besten kinder weiternehmen.
-#vlt. nur ein kind? crossover dass das beste weitergegeben werden
 
 
 class NDEAP:
@@ -78,11 +69,12 @@ class NDEAP:
 
         return minimum
 
-    #TODO wieder auf randrange(0,3) umändern
+
     def initialize_chromosomes(self):
         for i in range(self.mStartSize):
             #crossover des neuen Chromosoms wird bestimmt
-            rand = random.randrange(0, 3)
+            rand = random.randrange(0, 4)
+
 
             newChromo = ChromosomeDEAP(self.mMaxLength, rand)
             self.population.append(newChromo)
@@ -133,9 +125,19 @@ class NDEAP:
                     Operations.position_based_crossover(self, chromA, chromB, newIndex1, newIndex2)
                     self.position_based_co += 1
                     self.current_p_b += 1
-                else:
+                elif type == 2:
                     newChromo1 = ChromosomeDEAP(self.mMaxLength, 2)
                     newChromo2 = ChromosomeDEAP(self.mMaxLength, 2)
+                    self.population.append(newChromo1)
+                    newIndex1 = len(self.population) - 1
+                    self.population.append(newChromo2)
+                    newIndex2 = len(self.population) - 1
+                    Operations.two_point_crossover(self, chromA, chromB, newIndex1, newIndex2)
+                    self.two_point_co += 1
+                    self.current_t_p += 1
+                else:
+                    newChromo1 = ChromosomeDEAP(self.mMaxLength, 3)
+                    newChromo2 = ChromosomeDEAP(self.mMaxLength, 3)
                     self.population.append(newChromo1)
                     newIndex1 = len(self.population) - 1
                     self.population.append(newChromo2)
@@ -155,11 +157,9 @@ class NDEAP:
 
 
                 newChromo1 = self.population[newIndex1]
-                sys.stdout.write("Kind1 mit Fitness " + str(Chromosome.get_fitness(newChromo1))+"\n")
                 self.childCount += 1
 
                 newChromo2 = self.population[newIndex2]
-                sys.stdout.write("Kind2 mit Fitness " + str(Chromosome.get_fitness(newChromo2))+"\n")
                 self.childCount += 1
 
                 # Schedule next mutation.
@@ -193,9 +193,11 @@ class NDEAP:
             self.array_p_m.append(self.current_p_m)
             self.array_p_b.append(self.current_p_b)
             self.array_o_b.append(self.current_o_b)
+            self.array_t_p.append(self.current_t_p)
             self.current_p_m = 0
             self.current_p_b = 0
             self.current_o_b = 0
+            self.current_t_p = 0
 
             self.epoch += 1
 
@@ -211,7 +213,6 @@ class NDEAP:
                 if Chromosome.get_fitness(thisChromo) == 0:
                     sys.stdout.write(str(Chromosome.toStr(thisChromo))+" hat " + str(Chromosome.get_fitness(thisChromo)) + " fitness.\n")
                     Operations.set_foundMimimum(self, 1)
-                    #NQueen1.print_best_solution(self, thisChromo)
                     break
 
         sys.stdout.write("Completed " + str(self.epoch) + " epochs.\n")
@@ -220,39 +221,17 @@ class NDEAP:
         sys.stdout.write(
             "Encountered " + str(self.partielle_mapped_co) + " partiell-mapped , " +
             str(self.position_based_co) + " positioon-based and " + str(self.order_based_co)
-            + " order-based Crossover.\n")
+            + " order-based Crossover." + str(self.two_point_co)+ " two-point Crossover.\n")
 
         return
 
-    """
-    def show_fitness_per_epoche(self):
-
-        popSize = len(self.population)
-        fitness_array = [0]
-
-        for i in range(popSize):
-            thisChromo = self.population[i]
-            fitness_array.append(Chromosome.get_fitness(thisChromo))
-        array=np.asarray(self.array_fitness)
-        x = np.arange(1, self.epoch, 1)
-        y1 = array[x]
-        fig = plt.figure()
-        ax = fig.add_subplot(1, 1, 1)
-        plt.xlabel('Epochen')
-        plt.ylabel('Best Fitness/Population')
-        ax.plot(x, y1, color='cornflowerblue', label ='partielle_mapped')
-        plt.show()
-        #plt.savefig('crossovers_per_epoche.png')
-
-        return
-        """
 
 if __name__ == '__main__':
     foundMinimum = 0
-    array = [0, 0, 0]
+    array = [0, 0, 0, 0]
     counter = 0
     minarray = []
-    while(counter != 3):
+    while(counter != 100):
         print("_________________________________________________________________")
         sys.stdout.write("COUNTER: " + str(counter)+"\n")
         nSch = NDEAP(START_SIZE, MAX_EPOCHS, MATING_PROBABILITY, MUTATION_RATE, OFFSPRING_PER_GENERATION,
@@ -262,7 +241,7 @@ if __name__ == '__main__':
         nSch.genetic_algorithm()
         #zeige pro Durchlauf permutation-Anzahl und permutationen pro Epoche
         OverallPlots.show_permutation_amount(nSch)
-        #OverallPlots.show_crossover_per_epoche(nSch)
+        OverallPlots.show_crossover_per_epoche(nSch)
         OverallPlots.show_fitness_per_epoche(nSch)
 
         array = np.array(array) + Operations.get_best_crossover(nSch)

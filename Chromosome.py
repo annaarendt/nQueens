@@ -1,5 +1,5 @@
 class Chromosome:
-    #crossover-type 0,1 oder 2 (partitielle_mapped, position_based und order_based)
+    #crossover-type 0,1,2 oder 3 (partitielle_mapped, position_based, two-point und order_based)
     def __init__(self, maxLength, crossover_type):
         self.mMaxLength = maxLength
         self.mFitness = 0.0
@@ -13,35 +13,44 @@ class Chromosome:
         return
 
     def compute_fitness(self):
-        board = []
-        conflicts = 0
-        dx = [-1, 1, -1, 1]
-        dy = [-1, 1, 1, -1]
 
-        for i in range(self.mMaxLength):
-            board.append([""] * self.mMaxLength)
-            board[i][self.mData[i]] = "Q"
+        #wenn es mehrere Vorkommen einer Zahl im Chromosom gibt, wird die Fitness sehr schlecht.
+        if len(set(self.mData)) == len(self.mData):
 
-        # Walk through each of the Queens and compute the number of conflicts.
-        for i in range(self.mMaxLength):
-            x = i
-            y = self.mData[i]
+            board = []
+            conflicts = 0
+            dx = [-1, 1, -1, 1]
+            dy = [-1, 1, 1, -1]
 
-            # Check diagonals.
-            for j in range(4):
-                tempx = x
-                tempy = y
-                done = False
-                while not done:
-                    tempx += dx[j]
-                    tempy += dy[j]
-                    if (tempx < 0 or tempx >= self.mMaxLength) or (tempy < 0 or tempy >= self.mMaxLength):
-                        done = True
-                    else:
-                        if board[tempx][tempy] == "Q":
-                            conflicts += 1
+            for i in range(self.mMaxLength):
+                board.append([""] * self.mMaxLength)
+                board[i][self.mData[i]] = "Q"
 
-        self.mFitness = conflicts
+            # Walk through each of the Queens and compute the number of conflicts.
+            for i in range(self.mMaxLength):
+                x = i
+                y = self.mData[i]
+
+                # Check diagonals.
+                for j in range(4):
+                    tempx = x
+                    tempy = y
+                    done = False
+                    while not done:
+                        tempx += dx[j]
+                        tempy += dy[j]
+                        if (tempx < 0 or tempx >= self.mMaxLength) or (tempy < 0 or tempy >= self.mMaxLength):
+                            done = True
+                        else:
+                            if board[tempx][tempy] == "Q":
+                                conflicts += 1
+
+            self.mFitness = conflicts
+
+        #wenn doppete Allele vorkommen ist Fitness schlecht(hoch)
+        else: self.mFitness = 30
+
+
         return
 
     def get_fitness(self):
